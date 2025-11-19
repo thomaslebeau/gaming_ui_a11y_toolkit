@@ -24,7 +24,6 @@ export class DetectGamepadConnection {
     // Orchestrate disconnection detection
     this.repository.onDisconnect(() => {
       console.log('Use case: gamepad disconnected');
-      const disconnectedState = GamepadState.createDisconnected();
       onDisconnected();
     });
 
