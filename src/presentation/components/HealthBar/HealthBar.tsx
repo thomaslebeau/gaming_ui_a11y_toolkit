@@ -31,7 +31,7 @@ export const HealthBar = ({
   // Track previous percentage for smooth transitions
   const [displayPercentage, setDisplayPercentage] = useState(percentage);
   const previousPercentageRef = useRef(percentage);
-  const announcementTimeoutRef = useRef<NodeJS.Timeout>();
+  const announcementTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Live region for screen reader announcements
   const [announcement, setAnnouncement] = useState("");

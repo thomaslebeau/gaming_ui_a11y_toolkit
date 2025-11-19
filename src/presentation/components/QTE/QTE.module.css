@@ -1,0 +1,327 @@
+/* Container for the entire QTE component */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/* Main circular QTE display */
+.circle {
+  position: relative;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 0.25rem solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  /* Performance optimizations for 60fps animations */
+  will-change: border-color, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Color status: Safe (green, >60%) */
+.circle.safe {
+  border-color: #4caf50;
+  box-shadow: 0 0 1rem rgba(76, 175, 80, 0.5);
+}
+
+/* Color status: Warning (yellow, 30-60%) */
+.circle.warning {
+  border-color: #ffc107;
+  box-shadow: 0 0 1rem rgba(255, 193, 7, 0.5);
+}
+
+/* Color status: Danger (red, <30%) */
+.circle.danger {
+  border-color: #f44336;
+  box-shadow: 0 0 1rem rgba(244, 67, 54, 0.5);
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+/* Success state (green) */
+.circle.success {
+  border-color: #4caf50;
+  background: #1b5e20;
+  box-shadow: 0 0 1.5rem rgba(76, 175, 80, 0.8);
+}
+
+/* Failure state (red) */
+.circle.failure {
+  border-color: #f44336;
+  background: #b71c1c;
+  box-shadow: 0 0 1.5rem rgba(244, 67, 54, 0.8);
+}
+
+/* Pulse animation for danger state */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.05) translateZ(0);
+  }
+}
+
+/* SVG circular progress ring */
+.progressRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleY(-1); /* Flip to make clockwise */
+}
+
+/* Background circle (gray) */
+.progressRingBg {
+  stroke: #444;
+  opacity: 0.3;
+}
+
+/* Progress circle - inherits color from parent */
+.progressRingCircle {
+  transition: stroke-dashoffset 0.016s linear; /* 60fps (16ms per frame) */
+  will-change: stroke-dashoffset;
+}
+
+.progressRingCircle.safe {
+  stroke: #4caf50;
+}
+
+.progressRingCircle.warning {
+  stroke: #ffc107;
+}
+
+.progressRingCircle.danger {
+  stroke: #f44336;
+}
+
+.progressRingCircle.success {
+  stroke: #4caf50;
+}
+
+.progressRingCircle.failure {
+  stroke: #f44336;
+}
+
+/* Content inside the circle (button prompt + timer) */
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Button prompt text */
+.buttonPrompt {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  text-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.8);
+  user-select: none;
+
+  /* Force text to be crisp */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Timer text */
+.timer {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  text-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.8);
+  user-select: none;
+
+  /* Force text to be crisp */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Practice mode label */
+.practiceLabel {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #ffc107;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  user-select: none;
+}
+
+/* Status icon (checkmark/X) */
+.statusIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.8);
+  user-select: none;
+  animation: popIn 0.3s ease-out;
+}
+
+/* Pop-in animation for status icon */
+@keyframes popIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Instructions text below the circle */
+.instructions {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #e0e0e0;
+  text-align: center;
+  max-width: 20rem;
+}
+
+/* Screen reader only content */
+.srOnly {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  padding: 0;
+  margin: -0.0625rem;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicator for keyboard navigation */
+.circle:focus-visible {
+  outline: 0.1875rem solid #0066ff;
+  outline-offset: 0.25rem;
+  box-shadow: 0 0 0 0.3125rem rgba(0, 102, 255, 0.3);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .circle {
+    transition: none;
+    animation: none;
+  }
+
+  .progressRingCircle {
+    transition: none;
+  }
+
+  .statusIcon {
+    animation: none;
+  }
+
+  .danger {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .circle {
+    border-width: 0.375rem;
+  }
+
+  .circle.safe {
+    border-color: #0f0;
+  }
+
+  .circle.warning {
+    border-color: #ff0;
+  }
+
+  .circle.danger {
+    border-color: #f00;
+  }
+
+  .progressRingCircle.safe {
+    stroke: #0f0;
+  }
+
+  .progressRingCircle.warning {
+    stroke: #ff0;
+  }
+
+  .progressRingCircle.danger {
+    stroke: #f00;
+  }
+
+  .buttonPrompt,
+  .timer {
+    text-shadow: 0 0 0.25rem #000, 0 0 0.25rem #000;
+  }
+}
+
+/* Dark mode support (already optimized for dark) */
+@media (prefers-color-scheme: dark) {
+  .circle {
+    background: #1a1a1a;
+  }
+
+  .instructions {
+    color: #f0f0f0;
+  }
+}
+
+/* Light mode adjustments */
+@media (prefers-color-scheme: light) {
+  .circle {
+    background: #f5f5f5;
+    border-color: #333;
+  }
+
+  .circle.safe {
+    background: #e8f5e9;
+    border-color: #4caf50;
+  }
+
+  .circle.warning {
+    background: #fff8e1;
+    border-color: #ffc107;
+  }
+
+  .circle.danger {
+    background: #ffebee;
+    border-color: #f44336;
+  }
+
+  .buttonPrompt {
+    color: #333;
+  }
+
+  .timer {
+    color: #666;
+  }
+
+  .instructions {
+    color: #333;
+  }
+
+  .progressRingBg {
+    stroke: #ccc;
+  }
+}

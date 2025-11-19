@@ -1,10 +1,33 @@
+import { useState } from "react";
 import { GameButton } from "./presentation/components/GameButton";
 import { GameMenu } from "./presentation/components/GameMenu";
+import { QTE } from "./presentation/components/QTE";
 
 function App() {
+  const [qteKey, setQteKey] = useState(0);
+  const [qteMessage, setQteMessage] = useState("");
+
   const handleClick = () => {
     console.log("Button clicked!");
     alert("Button pressed! 🎮");
+  };
+
+  const handleQTESuccess = () => {
+    console.log("QTE Success!");
+    setQteMessage("✓ Success! Great timing!");
+    setTimeout(() => {
+      setQteKey((prev) => prev + 1);
+      setQteMessage("");
+    }, 2000);
+  };
+
+  const handleQTEFailure = () => {
+    console.log("QTE Failed!");
+    setQteMessage("✗ Failed! Try again!");
+    setTimeout(() => {
+      setQteKey((prev) => prev + 1);
+      setQteMessage("");
+    }, 2000);
   };
 
   const menuItems = [
@@ -77,6 +100,36 @@ function App() {
             Disabled Button
           </GameButton>
         </div>
+      </div>
+
+      <div style={{ textAlign: "center" }}>
+        <h2>QTE Demo (Quick Time Event)</h2>
+        <p style={{ marginBottom: "1rem", color: "#e0e0e0" }}>
+          Press the button shown before time runs out! <br />
+          Supports gamepad (A/B/X/Y) and keyboard (Space/Enter)
+        </p>
+        <QTE
+          key={qteKey}
+          buttonPrompt="Space"
+          duration={5000}
+          onSuccess={handleQTESuccess}
+          onFailure={handleQTEFailure}
+          difficulty="normal"
+          showTimer={true}
+          practiceMode={false}
+        />
+        {qteMessage && (
+          <div
+            style={{
+              marginTop: "1rem",
+              fontSize: "1.25rem",
+              fontWeight: "bold",
+              color: qteMessage.includes("Success") ? "#4caf50" : "#f44336",
+            }}
+          >
+            {qteMessage}
+          </div>
+        )}
       </div>
     </div>
   );
