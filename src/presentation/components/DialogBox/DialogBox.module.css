@@ -1,0 +1,224 @@
+/**
+ * DialogBox Component Styles
+ *
+ * Modal dialog with overlay, focus trap, and accessibility features.
+ * All sizes use rem units for accessibility.
+ */
+
+/* Overlay - full screen backdrop */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+
+  /* Performance optimization */
+  will-change: opacity;
+  backface-visibility: hidden;
+
+  /* Animation */
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dialog container */
+.dialog {
+  position: relative;
+  background-color: #1a1a2e;
+  border: 0.1875rem solid #4a4a6a;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  max-width: 40rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.5);
+
+  /* Performance optimization */
+  will-change: transform;
+  transform: translateZ(0);
+
+  /* Animation */
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Close button */
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: #e0e0e0;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.closeButton:focus {
+  outline: 0.125rem solid #00d9ff;
+  outline-offset: 0.125rem;
+}
+
+/* Character section */
+.characterSection {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 0.0625rem solid #4a4a6a;
+}
+
+.characterName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #00d9ff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Title */
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.3;
+}
+
+/* Content area */
+.content {
+  color: #e0e0e0;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.contentLine {
+  margin: 0 0 1rem 0;
+}
+
+.contentLine:last-child {
+  margin-bottom: 0;
+}
+
+/* Actions section */
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+/* Screen reader only content */
+.srOnly {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  padding: 0;
+  margin: -0.0625rem;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus styles for accessibility */
+.dialog:focus {
+  outline: 0.125rem solid #00d9ff;
+  outline-offset: 0.25rem;
+}
+
+/* Responsive design */
+@media (max-width: 48rem) {
+  .dialog {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .characterName {
+    font-size: 1.125rem;
+  }
+
+  .closeButton {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog {
+    animation: none;
+  }
+
+  .closeButton {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .dialog {
+    border-width: 0.25rem;
+  }
+
+  .closeButton:focus {
+    outline-width: 0.1875rem;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .dialog {
+    background-color: #0f0f1e;
+    border-color: #5a5a7a;
+  }
+}
