@@ -1,0 +1,185 @@
+/**
+ * Tooltip Component Styles
+ *
+ * Lightweight, accessible tooltip with auto-positioning and fade animation.
+ * All sizes use rem units for accessibility.
+ */
+
+/* Base tooltip styles */
+.tooltip {
+  position: absolute;
+  z-index: 9999;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  max-width: 15rem;
+  word-wrap: break-word;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  user-select: none;
+
+  /* Performance optimization */
+  will-change: opacity;
+  backface-visibility: hidden;
+
+  /* Fade in animation */
+  animation: fadeIn 0.15s ease-out;
+  opacity: 1;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Placement-specific styles with visual indicators */
+.tooltip.top::after,
+.tooltip.bottom::after,
+.tooltip.left::after,
+.tooltip.right::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+/* Arrow for top placement */
+.tooltip.top {
+  transform-origin: bottom center;
+}
+
+.tooltip.top::after {
+  bottom: -0.375rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0.375rem 0.375rem 0;
+  border-color: #1a1a1a transparent transparent transparent;
+}
+
+/* Arrow for bottom placement */
+.tooltip.bottom {
+  transform-origin: top center;
+}
+
+.tooltip.bottom::after {
+  top: -0.375rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 0.375rem 0.375rem;
+  border-color: transparent transparent #1a1a1a transparent;
+}
+
+/* Arrow for left placement */
+.tooltip.left {
+  transform-origin: right center;
+}
+
+.tooltip.left::after {
+  right: -0.375rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 0.375rem 0 0.375rem 0.375rem;
+  border-color: transparent transparent transparent #1a1a1a;
+}
+
+/* Arrow for right placement */
+.tooltip.right {
+  transform-origin: left center;
+}
+
+.tooltip.right::after {
+  left: -0.375rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 0.375rem 0.375rem 0.375rem 0;
+  border-color: transparent #1a1a1a transparent transparent;
+}
+
+/* Gaming theme enhancement - subtle glow */
+.tooltip {
+  border: 0.0625rem solid rgba(0, 217, 255, 0.3);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4),
+    0 0 0.5rem rgba(0, 217, 255, 0.1);
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .tooltip {
+    border-width: 0.125rem;
+    border-color: currentColor;
+  }
+
+  .tooltip::after {
+    border-width: 0.5rem;
+  }
+}
+
+/* Responsive sizing for smaller screens */
+@media (max-width: 48rem) {
+  .tooltip {
+    max-width: 12rem;
+    font-size: 0.8125rem;
+    padding: 0.4375rem 0.625rem;
+  }
+
+  .tooltip::after {
+    border-width: 0.3125rem;
+  }
+
+  .tooltip.top::after {
+    bottom: -0.3125rem;
+  }
+
+  .tooltip.bottom::after {
+    top: -0.3125rem;
+  }
+
+  .tooltip.left::after {
+    right: -0.3125rem;
+  }
+
+  .tooltip.right::after {
+    left: -0.3125rem;
+  }
+}
+
+/* Dark mode adjustments (already dark, but adjust for extra dark) */
+@media (prefers-color-scheme: dark) {
+  .tooltip {
+    background-color: #0f0f0f;
+    border-color: rgba(0, 217, 255, 0.4);
+  }
+
+  .tooltip.top::after {
+    border-top-color: #0f0f0f;
+  }
+
+  .tooltip.bottom::after {
+    border-bottom-color: #0f0f0f;
+  }
+
+  .tooltip.left::after {
+    border-left-color: #0f0f0f;
+  }
+
+  .tooltip.right::after {
+    border-right-color: #0f0f0f;
+  }
+}
