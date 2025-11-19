@@ -1,0 +1,151 @@
+/* Container for the entire health bar component */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 25rem; /* Maximum width for readability */
+}
+
+/* Label text above the bar */
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Outer container for the progress bar */
+.barContainer {
+  position: relative;
+  width: 100%;
+  height: 1.5rem;
+  background: #e0e0e0;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  border: 0.0625rem solid #ccc;
+
+  /* Performance optimizations for 60fps animations */
+  will-change: contents;
+  transform: translateZ(0); /* Force GPU acceleration */
+  backface-visibility: hidden;
+}
+
+/* Filled portion of the health bar */
+.barFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transition: width 0.3s cubic-bezier(0.33, 1, 0.68, 1); /* Smooth ease-out */
+
+  /* Performance optimizations */
+  will-change: width, background-color;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Color status: Healthy (green, >60%) */
+.healthy {
+  background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+}
+
+/* Color status: Warning (yellow, 30-60%) */
+.warning {
+  background: linear-gradient(90deg, #ffc107 0%, #ffca28 100%);
+}
+
+/* Color status: Critical (red, <30%) */
+.critical {
+  background: linear-gradient(90deg, #f44336 0%, #e57373 100%);
+}
+
+/* Text overlay showing current/max or percentage */
+.valueText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.5); /* Ensure contrast */
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+
+  /* Force text to be crisp */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Screen reader only content */
+.srOnly {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  padding: 0;
+  margin: -0.0625rem;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicator for keyboard navigation */
+.barContainer:focus-visible {
+  outline: 0.125rem solid #0066ff;
+  outline-offset: 0.125rem;
+  box-shadow: 0 0 0 0.1875rem rgba(0, 102, 255, 0.3);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .barFill {
+    transition: none;
+  }
+
+  .container {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .barContainer {
+    border: 0.125rem solid #000;
+  }
+
+  .healthy {
+    background: #0f0; /* Solid green for high contrast */
+  }
+
+  .warning {
+    background: #ff0; /* Solid yellow for high contrast */
+  }
+
+  .critical {
+    background: #f00; /* Solid red for high contrast */
+  }
+
+  .valueText {
+    text-shadow: 0 0 0.25rem #000, 0 0 0.25rem #000; /* Stronger shadow */
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .label {
+    color: #e0e0e0;
+  }
+
+  .barContainer {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+
+  .valueText {
+    color: #fff;
+  }
+}
