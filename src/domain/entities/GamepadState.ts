@@ -1,10 +1,18 @@
 // Pure business logic - no framework dependencies
 export class GamepadState {
+  readonly connected: boolean;
+  readonly buttonPressed: boolean;
+  readonly buttonIndex: number | null;
+
   constructor(
-    public readonly connected: boolean,
-    public readonly buttonPressed: boolean,
-    public readonly buttonIndex: number | null
-  ) {}
+    connected: boolean,
+    buttonPressed: boolean,
+    buttonIndex: number | null
+  ) {
+    this.connected = connected;
+    this.buttonPressed = buttonPressed;
+    this.buttonIndex = buttonIndex;
+  }
 
   // Business rule: a button is active only if gamepad is connected
   isButtonActive(): boolean {

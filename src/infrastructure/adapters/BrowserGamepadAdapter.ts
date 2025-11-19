@@ -5,12 +5,8 @@ import type { IGamepadRepository } from '../../domain/ports/IGamepadRepository';
 export class BrowserGamepadAdapter implements IGamepadRepository {
   private currentState: GamepadState = GamepadState.createDisconnected();
   private animationFrameId: number | null = null;
-  private connectCallback?: (state: GamepadState) => void;
-  private disconnectCallback?: () => void;
-  private buttonPollCallback?: (state: GamepadState) => void;
 
   onConnect(callback: (state: GamepadState) => void): void {
-    this.connectCallback = callback;
     
     const handleConnect = (e: GamepadEvent) => {
       console.log('🎮 Adapter: gamepad connected -', e.gamepad.id);
@@ -22,7 +18,6 @@ export class BrowserGamepadAdapter implements IGamepadRepository {
   }
 
   onDisconnect(callback: () => void): void {
-    this.disconnectCallback = callback;
     
     const handleDisconnect = () => {
       console.log('🎮 Adapter: gamepad disconnected');
@@ -34,8 +29,6 @@ export class BrowserGamepadAdapter implements IGamepadRepository {
   }
 
   pollButtons(callback: (state: GamepadState) => void): void {
-    this.buttonPollCallback = callback;
-
     const poll = () => {
       const gamepads = navigator.getGamepads();
       const gamepad = gamepads[0]; // Use first connected gamepad
