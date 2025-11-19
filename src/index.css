@@ -1,11 +1,14 @@
+/* Import design tokens */
+@import './styles/tokens.css';
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-base);
+  font-weight: var(--font-weight-normal);
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--color-text-primary-dark);
+  background-color: var(--color-neutral-900);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -14,12 +17,12 @@
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-secondary-base);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--color-primary-hover);
 }
 
 body {
@@ -31,38 +34,38 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-tight);
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
+  border-radius: var(--radius-base);
+  border: var(--border-width-thin) solid transparent;
+  padding: var(--padding-button-vertical) var(--padding-button-horizontal);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--color-neutral-950);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color var(--duration-moderate);
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--color-secondary-base);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: var(--outline-width-thick) auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--color-text-primary-light);
+    background-color: var(--color-neutral-50);
   }
   a:hover {
-    color: #747bff;
+    color: var(--color-secondary-hover);
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--color-neutral-100);
   }
 }

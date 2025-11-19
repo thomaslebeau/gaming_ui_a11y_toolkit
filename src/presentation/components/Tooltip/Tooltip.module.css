@@ -8,16 +8,16 @@
 /* Base tooltip styles */
 .tooltip {
   position: absolute;
-  z-index: 9999;
-  background-color: #1a1a1a;
-  color: #ffffff;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  line-height: 1.4;
+  z-index: var(--z-index-tooltip);
+  background-color: var(--color-neutral-950);
+  color: var(--color-text-white);
+  padding: var(--padding-tooltip-vertical) var(--padding-tooltip-horizontal);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
   max-width: 15rem;
   word-wrap: break-word;
-  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-base);
   pointer-events: none;
   user-select: none;
 
@@ -26,7 +26,7 @@
   backface-visibility: hidden;
 
   /* Fade in animation */
-  animation: fadeIn 0.15s ease-out;
+  animation: fadeIn var(--duration-fast) var(--timing-ease-out);
   opacity: 1;
 }
 
@@ -59,11 +59,11 @@
 }
 
 .tooltip.top::after {
-  bottom: -0.375rem;
+  bottom: calc(-1 * var(--spacing-6));
   left: 50%;
   transform: translateX(-50%);
-  border-width: 0.375rem 0.375rem 0;
-  border-color: #1a1a1a transparent transparent transparent;
+  border-width: var(--spacing-6) var(--spacing-6) 0;
+  border-color: var(--color-neutral-950) transparent transparent transparent;
 }
 
 /* Arrow for bottom placement */
@@ -72,11 +72,11 @@
 }
 
 .tooltip.bottom::after {
-  top: -0.375rem;
+  top: calc(-1 * var(--spacing-6));
   left: 50%;
   transform: translateX(-50%);
-  border-width: 0 0.375rem 0.375rem;
-  border-color: transparent transparent #1a1a1a transparent;
+  border-width: 0 var(--spacing-6) var(--spacing-6);
+  border-color: transparent transparent var(--color-neutral-950) transparent;
 }
 
 /* Arrow for left placement */
@@ -85,11 +85,11 @@
 }
 
 .tooltip.left::after {
-  right: -0.375rem;
+  right: calc(-1 * var(--spacing-6));
   top: 50%;
   transform: translateY(-50%);
-  border-width: 0.375rem 0 0.375rem 0.375rem;
-  border-color: transparent transparent transparent #1a1a1a;
+  border-width: var(--spacing-6) 0 var(--spacing-6) var(--spacing-6);
+  border-color: transparent transparent transparent var(--color-neutral-950);
 }
 
 /* Arrow for right placement */
@@ -98,18 +98,17 @@
 }
 
 .tooltip.right::after {
-  left: -0.375rem;
+  left: calc(-1 * var(--spacing-6));
   top: 50%;
   transform: translateY(-50%);
-  border-width: 0.375rem 0.375rem 0.375rem 0;
-  border-color: transparent #1a1a1a transparent transparent;
+  border-width: var(--spacing-6) var(--spacing-6) var(--spacing-6) 0;
+  border-color: transparent var(--color-neutral-950) transparent transparent;
 }
 
 /* Gaming theme enhancement - subtle glow */
 .tooltip {
-  border: 0.0625rem solid rgba(0, 217, 255, 0.3);
-  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.4),
-    0 0 0.5rem rgba(0, 217, 255, 0.1);
+  border: var(--spacing-1) solid var(--color-focus-gaming-glow);
+  box-shadow: var(--shadow-lg), var(--glow-gaming-sm);
 }
 
 /* Reduced motion preferences */
@@ -122,64 +121,64 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .tooltip {
-    border-width: 0.125rem;
+    border-width: var(--border-width-base);
     border-color: currentColor;
   }
 
   .tooltip::after {
-    border-width: 0.5rem;
+    border-width: var(--spacing-8);
   }
 }
 
 /* Responsive sizing for smaller screens */
 @media (max-width: 48rem) {
   .tooltip {
-    max-width: 12rem;
+    max-width: var(--max-width-sm);
     font-size: 0.8125rem;
-    padding: 0.4375rem 0.625rem;
+    padding: var(--spacing-7) var(--spacing-10);
   }
 
   .tooltip::after {
-    border-width: 0.3125rem;
+    border-width: var(--spacing-5);
   }
 
   .tooltip.top::after {
-    bottom: -0.3125rem;
+    bottom: calc(-1 * var(--spacing-5));
   }
 
   .tooltip.bottom::after {
-    top: -0.3125rem;
+    top: calc(-1 * var(--spacing-5));
   }
 
   .tooltip.left::after {
-    right: -0.3125rem;
+    right: calc(-1 * var(--spacing-5));
   }
 
   .tooltip.right::after {
-    left: -0.3125rem;
+    left: calc(-1 * var(--spacing-5));
   }
 }
 
 /* Dark mode adjustments (already dark, but adjust for extra dark) */
 @media (prefers-color-scheme: dark) {
   .tooltip {
-    background-color: #0f0f0f;
+    background-color: var(--color-dark-bg-darkest);
     border-color: rgba(0, 217, 255, 0.4);
   }
 
   .tooltip.top::after {
-    border-top-color: #0f0f0f;
+    border-top-color: var(--color-dark-bg-darkest);
   }
 
   .tooltip.bottom::after {
-    border-bottom-color: #0f0f0f;
+    border-bottom-color: var(--color-dark-bg-darkest);
   }
 
   .tooltip.left::after {
-    border-left-color: #0f0f0f;
+    border-left-color: var(--color-dark-bg-darkest);
   }
 
   .tooltip.right::after {
-    border-right-color: #0f0f0f;
+    border-right-color: var(--color-dark-bg-darkest);
   }
 }
