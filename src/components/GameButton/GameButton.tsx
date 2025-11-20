@@ -5,7 +5,7 @@
  * WCAG 2.1 AA compliant with keyboard navigation and gamepad support
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, forwardRef } from 'react';
 import type { GameButtonProps } from '../../types/button.types';
 import styles from '../../styles/components/GameButton.module.css';
 
@@ -30,7 +30,7 @@ import styles from '../../styles/components/GameButton.module.css';
  * />
  * ```
  */
-export const GameButton = ({
+export const GameButton = forwardRef<HTMLButtonElement, GameButtonProps>(({
   label,
   onClick,
   disabled = false,
@@ -39,9 +39,10 @@ export const GameButton = ({
   className = '',
   ariaDescribedBy,
   enableHapticFeedback = true,
-}: GameButtonProps) => {
+}, ref) => {
   const [isPressed, setIsPressed] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const internalRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = (ref as React.RefObject<HTMLButtonElement>) || internalRef;
 
   /**
    * Trigger haptic feedback on connected gamepad
@@ -181,7 +182,7 @@ export const GameButton = ({
 
   return (
     <button
-      ref={buttonRef}
+      ref={buttonRef as React.RefObject<HTMLButtonElement>}
       type="button"
       className={buttonClasses}
       onClick={handleClick}
@@ -201,6 +202,8 @@ export const GameButton = ({
       {label}
     </button>
   );
-};
+});
+
+GameButton.displayName = 'GameButton';
 
 export default GameButton;
