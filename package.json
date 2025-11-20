@@ -1,7 +1,7 @@
 {
   "name": "gaming-ui-a11y-toolkit",
   "version": "1.0.0",
-  "description": "Une bibliothèque React de composants accessibles pour créer des interfaces de jeu inclusives avec support du clavier, de la souris et de la manette de jeu.",
+  "description": "An accessible React component library for building inclusive game interfaces with keyboard, mouse, and gamepad support.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
