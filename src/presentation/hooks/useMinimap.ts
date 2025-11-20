@@ -3,8 +3,8 @@ import { MinimapState } from '../../domain/entities/MinimapState';
 import { POI, type Position } from '../../domain/entities/POI';
 import { UpdateMinimap } from '../../application/useCases/UpdateMinimap';
 import { BrowserMinimapAdapter } from '../../infrastructure/adapters/BrowserMinimapAdapter';
-import { BrowserGamepadAdapter } from '../../infrastructure/adapters/BrowserGamepadAdapter';
 import { DetectGamepadConnection } from '../../application/useCases/DetectGamepadConnection';
+import { useGamepadContext } from '../contexts/GamepadContext';
 
 interface UseMinimapOptions {
   playerPosition: Position;
@@ -53,10 +53,12 @@ export const useMinimap = ({
     )
   );
 
-  // Memoize use case and adapters to prevent recreation on every render
+  // Memoize use case and minimap adapter to prevent recreation on every render
   const updateUseCase = useMemo(() => new UpdateMinimap(), []);
   const adapter = useMemo(() => new BrowserMinimapAdapter(), []);
-  const gamepadAdapter = useMemo(() => new BrowserGamepadAdapter(), []);
+
+  // Utilise l'adapter centralisé du Context pour le gamepad
+  const { adapter: gamepadAdapter } = useGamepadContext();
 
   // Track visibility state for interval
   const isVisibleRef = useRef(minimapState.isVisible);
@@ -314,11 +316,10 @@ export const useMinimap = ({
     minimapState.focusedPOIId,
   ]);
 
-  // Cleanup adapters on unmount
+  // Cleanup minimap adapter on unmount (gamepad adapter est géré par le Context)
   useEffect(() => {
     return () => {
       adapter.cleanup();
-      gamepadAdapter.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty deps - cleanup only on unmount

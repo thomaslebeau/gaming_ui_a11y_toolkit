@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { MenuState } from "../../domain/entities/MenuState";
 import { NavigateMenu } from "../../application/useCases/NavigateMenu";
-import { BrowserGamepadAdapter } from "../../infrastructure/adapters/BrowserGamepadAdapter";
 import { DetectGamepadConnection } from "../../application/useCases/DetectGamepadConnection";
+import { useGamepadContext } from "../contexts/GamepadContext";
 
 /**
  * Hook for managing menu navigation with keyboard and gamepad support.
@@ -50,11 +50,11 @@ export const useMenuNavigation = (
   }, [handleNavigateUp, handleNavigateDown]);
 
   // Gamepad navigation (D-pad Up = button 12, D-pad Down = button 13)
-  // Memoize adapter to prevent recreation
-  const gamepadAdapter = useMemo(() => new BrowserGamepadAdapter(), []);
+  // Utilise l'adapter centralisé du Context
+  const { adapter } = useGamepadContext();
 
   useEffect(() => {
-    const useCase = new DetectGamepadConnection(gamepadAdapter);
+    const useCase = new DetectGamepadConnection(adapter);
 
     let lastButtonState = { up: false, down: false };
 
@@ -81,7 +81,7 @@ export const useMenuNavigation = (
     );
 
     return cleanup;
-  }, [handleNavigateUp, handleNavigateDown, gamepadAdapter]);
+  }, [handleNavigateUp, handleNavigateDown, adapter]);
 
   return {
     focusedIndex: menuState.focusedIndex,

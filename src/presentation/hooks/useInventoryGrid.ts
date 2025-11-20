@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { InventoryState } from '../../domain/entities/InventoryState';
 import type { InventoryItem } from '../../domain/entities/InventoryState';
 import { NavigateInventoryGrid } from '../../application/useCases/NavigateInventoryGrid';
 import { BrowserInventoryAdapter } from '../../infrastructure/adapters/BrowserInventoryAdapter';
-import { BrowserGamepadAdapter } from '../../infrastructure/adapters/BrowserGamepadAdapter';
 import { DetectGamepadConnection } from '../../application/useCases/DetectGamepadConnection';
+import { useGamepadContext } from '../contexts/GamepadContext';
 
 interface UseInventoryGridOptions {
   columns: number;
@@ -39,9 +39,11 @@ export const useInventoryGrid = ({
   // Memoize use case to prevent recreation on every render
   const navigateUseCase = useMemo(() => new NavigateInventoryGrid(), []);
 
-  // Memoize adapters to prevent recreation on every render
+  // Memoize inventory adapter to prevent recreation on every render
   const adapter = useMemo(() => new BrowserInventoryAdapter(), []);
-  const gamepadAdapter = useMemo(() => new BrowserGamepadAdapter(), []);
+
+  // Utilise l'adapter centralisé du Context pour le gamepad
+  const { adapter: gamepadAdapter } = useGamepadContext();
 
   // Update items when they change
   useEffect(() => {
@@ -248,11 +250,10 @@ export const useInventoryGrid = ({
     handleCancelMove,
   ]);
 
-  // Cleanup adapters on unmount
+  // Cleanup inventory adapter on unmount (gamepad adapter est géré par le Context)
   useEffect(() => {
     return () => {
       adapter.cleanup();
-      gamepadAdapter.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty deps - cleanup only on unmount
