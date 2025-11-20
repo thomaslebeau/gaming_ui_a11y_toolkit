@@ -1,64 +1,64 @@
 # 🎮 Gaming UI A11y Toolkit
 
-> Une bibliothèque React de composants accessibles pour créer des interfaces de jeu inclusives avec support du clavier, de la souris et de la manette de jeu.
+> An accessible React component library for building inclusive game interfaces with keyboard, mouse, and gamepad support.
 
 [![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![npm](https://img.shields.io/npm/v/gaming-ui-a11y-toolkit)](https://www.npmjs.com/package/gaming-ui-a11y-toolkit)
 
-## 📋 Table des matières
+## 📋 Table of Contents
 
-- [À propos](#-à-propos)
-- [Fonctionnalités](#-fonctionnalités)
+- [About](#-about)
+- [Features](#-features)
 - [Installation](#-installation)
-- [Composants disponibles](#-composants-disponibles)
-- [Hooks personnalisés](#-hooks-personnalisés)
-- [Utilisation](#-utilisation)
-- [API](#-api)
-- [Développement](#-développement)
-- [Contribuer](#-contribuer)
-- [Licence](#-licence)
+- [Available Components](#-available-components)
+- [Custom Hooks](#-custom-hooks)
+- [Usage](#-usage)
+- [API Reference](#-api-reference)
+- [Development](#-development)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-## 🎯 À propos
+## 🎯 About
 
-**Gaming UI A11y Toolkit** est une bibliothèque de composants React spécialement conçue pour créer des interfaces de jeu accessibles. Elle combine les meilleures pratiques d'accessibilité (WCAG 2.1 AA) avec l'expérience de jeu moderne, offrant un support complet pour :
+**Gaming UI A11y Toolkit** is a React component library specifically designed to create accessible game interfaces. It combines accessibility best practices (WCAG 2.1 AA) with modern gaming experience, offering complete support for:
 
-- ⌨️ **Navigation au clavier** (touches fléchées, Entrée, Espace, Échap)
-- 🎮 **Support manette** (D-pad, boutons A/B via Gamepad API)
-- 🕹️ **Navigation au joystick** (stick analogique gauche)
-- 🔊 **Lecteurs d'écran** (annonces ARIA, rôles sémantiques)
-- ♿ **Conformité WCAG 2.1 AA** (focus visible, gestion du focus)
-- 📳 **Retour haptique** (vibrations sur manette)
+- ⌨️ **Keyboard navigation** (arrow keys, Enter, Space, Escape)
+- 🎮 **Gamepad support** (D-pad, A/B buttons via Gamepad API)
+- 🕹️ **Joystick navigation** (left analog stick)
+- 🔊 **Screen readers** (ARIA announcements, semantic roles)
+- ♿ **WCAG 2.1 AA compliance** (visible focus, focus management)
+- 📳 **Haptic feedback** (gamepad vibration)
 
-Cette bibliothèque est idéale pour développer des jeux web inclusifs, des menus de jeu accessibles, ou toute interface nécessitant une navigation à la manette.
+This library is ideal for developing inclusive web games, accessible game menus, or any interface requiring gamepad navigation.
 
-## ✨ Fonctionnalités
+## ✨ Features
 
-### Accessibilité complète
-- Navigation fluide au clavier et à la manette
-- Annonces vocales pour les lecteurs d'écran
-- Gestion intelligente du focus
-- Indicateurs de focus visuels avec effets gaming
-- Support du retour haptique sur manette
+### Complete Accessibility
+- Smooth keyboard and gamepad navigation
+- Voice announcements for screen readers
+- Intelligent focus management
+- Visual focus indicators with gaming effects
+- Gamepad haptic feedback support
 
-### Composants spécialisés pour le gaming
-- Bouton de jeu avec retour haptique
-- Menu de jeu avec navigation verticale (D-pad et joystick)
-- Support complet de la Gamepad API
-- Détection automatique de connexion manette
+### Specialized Gaming Components
+- Game button with haptic feedback
+- Game menu with vertical navigation (D-pad and joystick)
+- Full Gamepad API support
+- Automatic gamepad connection detection
 
-### Architecture propre
-- TypeScript strict pour la sécurité des types
-- Composants réutilisables et composables
-- Hooks personnalisés pour la logique métier
-- Tests unitaires inclus
+### Clean Architecture
+- Strict TypeScript for type safety
+- Reusable and composable components
+- Custom hooks for business logic
+- Unit tests included
 
-### Système de design cohérent
-- Tokens CSS pour toute la palette visuelle
-- Variables CSS personnalisables
-- Thèmes clair et sombre
-- Animations fluides et performantes
+### Consistent Design System
+- CSS tokens for complete visual palette
+- Customizable CSS variables
+- Light and dark themes
+- Smooth and performant animations
 
 ## 📦 Installation
 
@@ -66,102 +66,102 @@ Cette bibliothèque est idéale pour développer des jeux web inclusifs, des men
 npm install gaming-ui-a11y-toolkit
 ```
 
-ou avec yarn :
+or with yarn:
 
 ```bash
 yarn add gaming-ui-a11y-toolkit
 ```
 
-ou avec pnpm :
+or with pnpm:
 
 ```bash
 pnpm add gaming-ui-a11y-toolkit
 ```
 
-## 🧩 Composants disponibles
+## 🧩 Available Components
 
 ### GameButton
 
-Bouton d'action de base avec support manette et retour haptique.
+Basic action button with gamepad support and haptic feedback.
 
 ```tsx
 import { GameButton } from 'gaming-ui-a11y-toolkit';
 
 <GameButton
-  label="Commencer"
+  label="Start"
   onClick={handleClick}
   variant="primary"
   size="large"
 />
 ```
 
-**Fonctionnalités :**
-- Conformité WCAG 2.1 AA
-- Navigation clavier (Entrée et Espace)
-- Support des lecteurs d'écran
-- Retour haptique sur manette
-- États visuels (pressé, désactivé, focus)
+**Features:**
+- WCAG 2.1 AA compliant
+- Keyboard navigation (Enter and Space)
+- Screen reader support
+- Gamepad haptic feedback
+- Visual states (pressed, disabled, focused)
 
 ---
 
 ### GameMenu
 
-Menu vertical avec navigation au clavier, D-pad et joystick analogique.
+Vertical menu with keyboard, D-pad, and analog joystick navigation.
 
 ```tsx
 import { GameMenu } from 'gaming-ui-a11y-toolkit';
 
 const menuItems = [
-  { id: 'start', label: 'Nouvelle partie', onSelect: startGame },
-  { id: 'load', label: 'Charger une partie', onSelect: loadGame },
+  { id: 'start', label: 'New Game', onSelect: startGame },
+  { id: 'load', label: 'Load Game', onSelect: loadGame },
   { id: 'options', label: 'Options', onSelect: showOptions },
-  { id: 'quit', label: 'Quitter', onSelect: quitGame }
+  { id: 'quit', label: 'Quit', onSelect: quitGame }
 ];
 
 <GameMenu
-  title="Menu Principal"
+  title="Main Menu"
   items={menuItems}
   enableHapticFeedback={true}
 />
 ```
 
-**Navigation :**
-- ⬆️⬇️ Touches fléchées pour naviguer
-- 🎮 D-pad (boutons 12/13) pour naviguer
-- 🕹️ Joystick gauche (axe Y) pour naviguer
-- Entrée/Espace ou bouton A pour sélectionner
-- Home/End pour aller au début/fin
-- Indicateur visuel de manette connectée
+**Navigation:**
+- ⬆️⬇️ Arrow keys to navigate
+- 🎮 D-pad (buttons 12/13) to navigate
+- 🕹️ Left joystick (Y axis) to navigate
+- Enter/Space or A button to select
+- Home/End to jump to start/end
+- Visual gamepad connected indicator
 
-## 🎣 Hooks personnalisés
+## 🎣 Custom Hooks
 
 ### useGamepadNavigation
 
-Gère la navigation au clavier et à la manette pour les menus.
+Manages keyboard and gamepad navigation for menus.
 
 ```tsx
-import { useGamepadNavigation } from 'gaming-ui-a11y-toolkit/hooks';
+import { useGamepadNavigation } from 'gaming-ui-a11y-toolkit';
 
 const { selectedIndex, isGamepadConnected, setSelectedIndex } = useGamepadNavigation({
   itemCount: items.length,
   initialIndex: 0,
-  onSelectionChange: (index) => console.log('Sélectionné:', index),
-  onActivate: (index) => console.log('Activé:', index),
+  onSelectionChange: (index) => console.log('Selected:', index),
+  onActivate: (index) => console.log('Activated:', index),
   enableHapticFeedback: true,
   joystickDeadzone: 0.5
 });
 ```
 
-**Fonctionnalités :**
-- Détection automatique de manette
-- Support D-pad (boutons 12/13)
-- Support joystick gauche avec zone morte configurable
-- Retour haptique sur changement de sélection
-- Activation avec bouton A (bouton 0)
+**Features:**
+- Automatic gamepad detection
+- D-pad support (buttons 12/13)
+- Left joystick support with configurable deadzone
+- Haptic feedback on selection change
+- Activation with A button (button 0)
 
-## 💻 Utilisation
+## 💻 Usage
 
-### Exemple complet : Menu de jeu
+### Complete Example: Game Menu
 
 ```tsx
 import { useState } from 'react';
@@ -173,15 +173,15 @@ function GameApp() {
   const menuItems = [
     {
       id: 'start',
-      label: 'Nouvelle partie',
+      label: 'New Game',
       icon: '🎮',
       onSelect: () => setGameState('playing')
     },
     {
       id: 'load',
-      label: 'Charger une partie',
+      label: 'Load Game',
       icon: '💾',
-      onSelect: () => console.log('Chargement...')
+      onSelect: () => console.log('Loading...')
     },
     {
       id: 'options',
@@ -191,7 +191,7 @@ function GameApp() {
     },
     {
       id: 'quit',
-      label: 'Quitter',
+      label: 'Quit',
       icon: '🚪',
       onSelect: () => window.close()
     }
@@ -199,24 +199,24 @@ function GameApp() {
 
   return (
     <div className="game-container">
-      <h1>Mon jeu accessible</h1>
+      <h1>My Accessible Game</h1>
 
       {gameState === 'menu' && (
         <GameMenu
-          title="Menu Principal"
+          title="Main Menu"
           items={menuItems}
           enableHapticFeedback={true}
           onSelectionChange={(index) => {
-            console.log('Navigation vers:', menuItems[index].label);
+            console.log('Navigating to:', menuItems[index].label);
           }}
         />
       )}
 
       {gameState === 'playing' && (
         <div>
-          <h2>Jeu en cours...</h2>
+          <h2>Game in progress...</h2>
           <button onClick={() => setGameState('menu')}>
-            Retour au menu
+            Back to menu
           </button>
         </div>
       )}
@@ -227,7 +227,7 @@ function GameApp() {
 export default GameApp;
 ```
 
-### Exemple : Boutons d'action
+### Example: Action Buttons
 
 ```tsx
 import { GameButton } from 'gaming-ui-a11y-toolkit';
@@ -236,22 +236,22 @@ function ActionButtons() {
   return (
     <div className="button-group">
       <GameButton
-        label="Attaquer"
-        onClick={() => console.log('Attaque!')}
+        label="Attack"
+        onClick={() => console.log('Attack!')}
         variant="primary"
         size="large"
         enableHapticFeedback={true}
       />
 
       <GameButton
-        label="Défendre"
-        onClick={() => console.log('Défense!')}
+        label="Defend"
+        onClick={() => console.log('Defend!')}
         variant="secondary"
         size="medium"
       />
 
       <GameButton
-        label="Action désactivée"
+        label="Disabled Action"
         onClick={() => {}}
         disabled={true}
       />
@@ -260,42 +260,51 @@ function ActionButtons() {
 }
 ```
 
-## 📚 API
+### Importing Styles
+
+Don't forget to import the CSS file in your application:
+
+```tsx
+// In your main entry file (e.g., main.tsx or App.tsx)
+import 'gaming-ui-a11y-toolkit/dist/style.css';
+```
+
+## 📚 API Reference
 
 ### GameButton Props
 
-| Prop | Type | Défaut | Description |
-|------|------|--------|-------------|
-| `label` | `string` | **requis** | Texte du bouton (également utilisé pour aria-label) |
-| `onClick` | `() => void` | **requis** | Fonction appelée au clic |
-| `disabled` | `boolean` | `false` | Désactive le bouton |
-| `variant` | `'primary' \| 'secondary'` | `'primary'` | Variante visuelle du bouton |
-| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | Taille du bouton |
-| `className` | `string` | `''` | Classes CSS additionnelles |
-| `enableHapticFeedback` | `boolean` | `true` | Active le retour haptique |
-| `ariaDescribedBy` | `string` | - | ID de l'élément de description ARIA |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | **required** | Button text (also used for aria-label) |
+| `onClick` | `() => void` | **required** | Click handler function |
+| `disabled` | `boolean` | `false` | Disables the button |
+| `variant` | `'primary' \| 'secondary'` | `'primary'` | Visual variant of the button |
+| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | Button size |
+| `className` | `string` | `''` | Additional CSS class names |
+| `enableHapticFeedback` | `boolean` | `true` | Enable haptic feedback on gamepad |
+| `ariaDescribedBy` | `string` | - | ID of element that describes this button |
 
 ### GameMenu Props
 
-| Prop | Type | Défaut | Description |
-|------|------|--------|-------------|
-| `items` | `GameMenuItem[]` | **requis** | Liste des éléments du menu |
-| `title` | `string` | - | Titre du menu |
-| `initialSelectedIndex` | `number` | `0` | Index initial sélectionné |
-| `enableHapticFeedback` | `boolean` | `true` | Active le retour haptique |
-| `onSelectionChange` | `(index: number) => void` | - | Callback lors du changement de sélection |
-| `className` | `string` | `''` | Classes CSS additionnelles |
-| `joystickDeadzone` | `number` | `0.5` | Zone morte du joystick (0-1) |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `GameMenuItem[]` | **required** | Array of menu items |
+| `title` | `string` | - | Menu title |
+| `initialSelectedIndex` | `number` | `0` | Initial selected index |
+| `enableHapticFeedback` | `boolean` | `true` | Enable haptic feedback |
+| `onSelectionChange` | `(index: number) => void` | - | Callback when selection changes |
+| `className` | `string` | `''` | Additional CSS class names |
+| `joystickDeadzone` | `number` | `0.5` | Joystick deadzone (0-1) |
 
 ### GameMenuItem Type
 
 ```typescript
 interface GameMenuItem {
-  id: string;              // Identifiant unique
-  label: string;           // Texte affiché
-  onSelect: () => void;    // Action à l'activation
-  disabled?: boolean;      // Désactiver l'élément
-  icon?: string;           // Icône optionnelle
+  id: string;              // Unique identifier
+  label: string;           // Display text
+  onSelect: () => void;    // Action on activation
+  disabled?: boolean;      // Disable the item
+  icon?: string;           // Optional icon
 }
 ```
 
@@ -303,46 +312,56 @@ interface GameMenuItem {
 
 ```typescript
 interface UseGamepadNavigationOptions {
-  itemCount: number;                          // Nombre total d'éléments
-  initialIndex?: number;                      // Index initial (défaut: 0)
-  onSelectionChange?: (index: number) => void; // Callback changement
-  onActivate?: (index: number) => void;        // Callback activation
-  enableHapticFeedback?: boolean;              // Retour haptique (défaut: true)
-  joystickDeadzone?: number;                   // Zone morte (défaut: 0.5)
+  itemCount: number;                          // Total number of items
+  initialIndex?: number;                      // Initial index (default: 0)
+  onSelectionChange?: (index: number) => void; // Selection change callback
+  onActivate?: (index: number) => void;        // Activation callback
+  enableHapticFeedback?: boolean;              // Haptic feedback (default: true)
+  joystickDeadzone?: number;                   // Deadzone (default: 0.5)
 }
 ```
 
-## 🛠️ Développement
+### useGamepadNavigation Return Value
 
-### Prérequis
+```typescript
+interface UseGamepadNavigationReturn {
+  selectedIndex: number;           // Currently selected index
+  isGamepadConnected: boolean;     // Gamepad connection status
+  setSelectedIndex: (index: number) => void; // Manually set index
+}
+```
+
+## 🛠️ Development
+
+### Prerequisites
 
 - Node.js 18+
-- npm, yarn ou pnpm
+- npm, yarn, or pnpm
 
-### Installation locale
+### Local Installation
 
 ```bash
-# Cloner le dépôt
+# Clone the repository
 git clone https://github.com/thomaslebeau/gaming_ui_a11y_toolkit.git
 cd gaming_ui_a11y_toolkit
 
-# Installer les dépendances
+# Install dependencies
 npm install
 
-# Lancer en mode développement
+# Run in development mode
 npm run dev
 
-# Builder pour la production
+# Build for production
 npm run build
 
-# Lancer les tests
+# Run tests
 npm test
 
-# Linter le code
+# Lint code
 npm run lint
 ```
 
-### Structure du projet
+### Project Structure
 
 ```
 gaming_ui_a11y_toolkit/
@@ -361,77 +380,79 @@ gaming_ui_a11y_toolkit/
 │   │   ├── button.types.ts
 │   │   ├── menu.types.ts
 │   │   └── Gamepad.type.ts
-│   └── styles/
-│       └── components/
+│   ├── styles/
+│   │   └── components/
+│   └── index.ts
+├── dist/
 ├── package.json
 ├── tsconfig.json
 └── vite.config.ts
 ```
 
-### Stack technologique
+### Tech Stack
 
-- **React 19.2** - Bibliothèque UI avec React Compiler
-- **TypeScript 5.9** - Typage statique strict
-- **Vite (rolldown)** - Outil de build ultra-rapide
-- **CSS Modules** - Styles scopés par composant
-- **Gamepad API** - Support natif manette de jeu
-- **ARIA** - Accessibilité sémantique
+- **React 19.2** - UI library with React Compiler
+- **TypeScript 5.9** - Strict static typing
+- **Vite (rolldown)** - Ultra-fast build tool
+- **CSS Modules** - Scoped component styles
+- **Gamepad API** - Native gamepad support
+- **ARIA** - Semantic accessibility
 
-## 🤝 Contribuer
+## 🤝 Contributing
 
-Les contributions sont les bienvenues ! Voici comment participer :
+Contributions are welcome! Here's how to participate:
 
-1. **Forkez** le projet
-2. **Créez** une branche pour votre fonctionnalité (`git checkout -b feature/SuperFeature`)
-3. **Committez** vos changements (`git commit -m 'Ajout SuperFeature'`)
-4. **Pushez** vers la branche (`git push origin feature/SuperFeature`)
-5. **Ouvrez** une Pull Request
+1. **Fork** the project
+2. **Create** a branch for your feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request
 
-### Directives de contribution
+### Contribution Guidelines
 
-- Respectez les conventions TypeScript du projet
-- Écrivez des tests pour les nouvelles fonctionnalités
-- Documentez les composants avec JSDoc
-- Assurez l'accessibilité (WCAG 2.1 AA minimum)
-- Testez avec clavier ET manette
-- Suivez les principes de Clean Code
+- Follow the project's TypeScript conventions
+- Write tests for new features
+- Document components with JSDoc
+- Ensure accessibility (WCAG 2.1 AA minimum)
+- Test with BOTH keyboard AND gamepad
+- Follow Clean Code principles
 
-## 🐛 Signaler un bug
+## 🐛 Reporting Bugs
 
-Si vous trouvez un bug, veuillez [ouvrir une issue](https://github.com/thomaslebeau/gaming_ui_a11y_toolkit/issues) avec :
+If you find a bug, please [open an issue](https://github.com/thomaslebeau/gaming_ui_a11y_toolkit/issues) with:
 
-- Une description claire du problème
-- Les étapes pour reproduire
-- Le comportement attendu vs actuel
-- Votre environnement (navigateur, OS, version)
+- Clear description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- Your environment (browser, OS, version)
 
 ## 🗺️ Roadmap
 
-Fonctionnalités prévues pour les prochaines versions :
+Features planned for future releases:
 
-- [ ] HealthBar - Barre de vie avec zones colorées
-- [ ] InventoryGrid - Grille d'inventaire 2D navigable
-- [ ] DialogBox - Boîte de dialogue modale avec focus trap
-- [ ] Tooltip - Info-bulles contextuelles accessibles
-- [ ] useDialogFocus - Hook pour gestion du focus modal
-- [ ] useInventoryGrid - Hook pour navigation 2D
-- [ ] Support des thèmes personnalisables
-- [ ] Plus de composants gaming accessibles
+- [ ] HealthBar - Health bar with colored zones
+- [ ] InventoryGrid - Navigable 2D inventory grid
+- [ ] DialogBox - Modal dialog with focus trap
+- [ ] Tooltip - Accessible contextual tooltips
+- [ ] useDialogFocus - Hook for modal focus management
+- [ ] useInventoryGrid - Hook for 2D navigation
+- [ ] Customizable theme support
+- [ ] More accessible gaming components
 
-## 📄 Licence
+## 📄 License
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 🙏 Remerciements
+## 🙏 Acknowledgments
 
-Ce projet a été développé dans le but de rendre les jeux web plus accessibles à tous les joueurs, quelles que soient leurs capacités. Merci à la communauté de l'accessibilité et aux développeurs de jeux pour leur inspiration.
+This project was developed with the goal of making web games more accessible to all players, regardless of their abilities. Thanks to the accessibility community and game developers for their inspiration.
 
 ## 📞 Contact
 
 Thomas Lebeau - [@thomaslebeau](https://github.com/thomaslebeau)
 
-Lien du projet : [https://github.com/thomaslebeau/gaming_ui_a11y_toolkit](https://github.com/thomaslebeau/gaming_ui_a11y_toolkit)
+Project Link: [https://github.com/thomaslebeau/gaming_ui_a11y_toolkit](https://github.com/thomaslebeau/gaming_ui_a11y_toolkit)
 
 ---
 
-**Fait avec ❤️ pour l'inclusion et l'accessibilité dans le gaming**
+**Made with ❤️ for inclusion and accessibility in gaming**
