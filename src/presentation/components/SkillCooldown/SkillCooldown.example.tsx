@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { SkillCooldown } from './SkillCooldown';
 import { useSkillCooldown } from '../../hooks/useSkillCooldown';
 import { useGamepadContext } from '../../contexts/GamepadContext';
@@ -75,6 +75,36 @@ export const SkillCooldownExample = () => {
   // Gamepad support - map gamepad buttons to skills - utilise le Context centralisé
   const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  // Use refs to capture latest handlers and skill states without triggering re-subscription
+  const handlersRef = useRef({
+    handleFireballCast,
+    handleDashCast,
+    handleHealCast,
+    handleUltimateCast,
+  });
+  const skillStatesRef = useRef({
+    fireball: { isReady: fireballSkill.isReady, isDisabled: fireballSkill.isDisabled },
+    dash: { isReady: dashSkill.isReady, isDisabled: dashSkill.isDisabled },
+    heal: { isReady: healSkill.isReady, isDisabled: healSkill.isDisabled },
+    ultimate: { isReady: ultimateSkill.isReady, isDisabled: ultimateSkill.isDisabled },
+  });
+
+  // Update refs on every render
+  useEffect(() => {
+    handlersRef.current = {
+      handleFireballCast,
+      handleDashCast,
+      handleHealCast,
+      handleUltimateCast,
+    };
+    skillStatesRef.current = {
+      fireball: { isReady: fireballSkill.isReady, isDisabled: fireballSkill.isDisabled },
+      dash: { isReady: dashSkill.isReady, isDisabled: dashSkill.isDisabled },
+      heal: { isReady: healSkill.isReady, isDisabled: healSkill.isDisabled },
+      ultimate: { isReady: ultimateSkill.isReady, isDisabled: ultimateSkill.isDisabled },
+    };
+  });
+
   useEffect(() => {
     const lastButtonState = {
       button0: false, // A/Cross - Fireball
@@ -88,8 +118,9 @@ export const SkillCooldownExample = () => {
       // Button 0 (A/Cross) - Fireball
       if (gamepadState.buttonIndex === 0 && !lastButtonState.button0) {
         lastButtonState.button0 = true;
-        if (fireballSkill.isReady && !fireballSkill.isDisabled) {
-          handleFireballCast();
+        const { isReady, isDisabled } = skillStatesRef.current.fireball;
+        if (isReady && !isDisabled) {
+          handlersRef.current.handleFireballCast();
         }
       } else if (gamepadState.buttonIndex !== 0) {
         lastButtonState.button0 = false;
@@ -98,8 +129,9 @@ export const SkillCooldownExample = () => {
       // Button 1 (B/Circle) - Dash
       if (gamepadState.buttonIndex === 1 && !lastButtonState.button1) {
         lastButtonState.button1 = true;
-        if (dashSkill.isReady && !dashSkill.isDisabled) {
-          handleDashCast();
+        const { isReady, isDisabled } = skillStatesRef.current.dash;
+        if (isReady && !isDisabled) {
+          handlersRef.current.handleDashCast();
         }
       } else if (gamepadState.buttonIndex !== 1) {
         lastButtonState.button1 = false;
@@ -108,8 +140,9 @@ export const SkillCooldownExample = () => {
       // Button 2 (X/Square) - Heal
       if (gamepadState.buttonIndex === 2 && !lastButtonState.button2) {
         lastButtonState.button2 = true;
-        if (healSkill.isReady && !healSkill.isDisabled) {
-          handleHealCast();
+        const { isReady, isDisabled } = skillStatesRef.current.heal;
+        if (isReady && !isDisabled) {
+          handlersRef.current.handleHealCast();
         }
       } else if (gamepadState.buttonIndex !== 2) {
         lastButtonState.button2 = false;
@@ -118,8 +151,9 @@ export const SkillCooldownExample = () => {
       // Button 3 (Y/Triangle) - Ultimate
       if (gamepadState.buttonIndex === 3 && !lastButtonState.button3) {
         lastButtonState.button3 = true;
-        if (ultimateSkill.isReady && !ultimateSkill.isDisabled) {
-          handleUltimateCast();
+        const { isReady, isDisabled } = skillStatesRef.current.ultimate;
+        if (isReady && !isDisabled) {
+          handlersRef.current.handleUltimateCast();
         }
       } else if (gamepadState.buttonIndex !== 3) {
         lastButtonState.button3 = false;
@@ -127,17 +161,7 @@ export const SkillCooldownExample = () => {
     });
 
     return unsubscribe;
-  }, [
-    subscribeToButtonPress,
-    fireballSkill.isReady,
-    fireballSkill.isDisabled,
-    dashSkill.isReady,
-    dashSkill.isDisabled,
-    healSkill.isReady,
-    healSkill.isDisabled,
-    ultimateSkill.isReady,
-    ultimateSkill.isDisabled,
-  ]);
+  }, [subscribeToButtonPress]); // Only re-subscribe if subscribeToButtonPress changes
 
   // Keyboard shortcuts
   useEffect(() => {

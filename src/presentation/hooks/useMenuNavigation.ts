@@ -52,6 +52,20 @@ export const useMenuNavigation = (
   // Utilise le Context centralisé
   const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  // Use refs to capture latest handlers without triggering re-subscription
+  const handlersRef = useRef({
+    handleNavigateUp,
+    handleNavigateDown,
+  });
+
+  // Update ref on every render
+  useEffect(() => {
+    handlersRef.current = {
+      handleNavigateUp,
+      handleNavigateDown,
+    };
+  });
+
   useEffect(() => {
     let lastButtonState = { up: false, down: false };
 
@@ -60,7 +74,7 @@ export const useMenuNavigation = (
       // D-pad Up (button 12)
       if (gamepadState.buttonIndex === 12 && !lastButtonState.up) {
         lastButtonState.up = true;
-        handleNavigateUp();
+        handlersRef.current.handleNavigateUp();
       } else if (gamepadState.buttonIndex !== 12) {
         lastButtonState.up = false;
       }
@@ -68,14 +82,14 @@ export const useMenuNavigation = (
       // D-pad Down (button 13)
       if (gamepadState.buttonIndex === 13 && !lastButtonState.down) {
         lastButtonState.down = true;
-        handleNavigateDown();
+        handlersRef.current.handleNavigateDown();
       } else if (gamepadState.buttonIndex !== 13) {
         lastButtonState.down = false;
       }
     });
 
     return unsubscribe;
-  }, [handleNavigateUp, handleNavigateDown, subscribeToButtonPress]);
+  }, [subscribeToButtonPress]); // Only re-subscribe if subscribeToButtonPress changes
 
   return {
     focusedIndex: menuState.focusedIndex,
