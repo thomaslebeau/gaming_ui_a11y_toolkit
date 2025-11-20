@@ -41,60 +41,64 @@ export const VirtualKeyboard = ({
   const keyboardRef = useRef<HTMLDivElement>(null);
   const gamepadState = useGamepad();
 
+  // Track previous axis state to debounce navigation
+  const lastAxisStateRef = useRef({ horizontal: 0, vertical: 0 });
+  const lastButtonStateRef = useRef({ a: false, b: false });
+
   // Handle gamepad navigation
   useEffect(() => {
     if (!isVisible || !gamepadState.connected) return;
 
-    const handleGamepadInput = () => {
-      const axes = gamepadState.axes;
+    const axes = gamepadState.axes;
+    const DEADZONE = 0.3;
+    const horizontalAxis = axes[0] || 0;
+    const verticalAxis = axes[1] || 0;
 
-      // D-pad or left stick navigation (with deadzone)
-      const DEADZONE = 0.3;
-      const horizontalAxis = axes[0] || 0;
-      const verticalAxis = axes[1] || 0;
-
-      // Horizontal navigation (left/right)
-      if (Math.abs(horizontalAxis) > DEADZONE) {
-        const maxCols = keys[selectedRow].length - 1;
-        if (horizontalAxis > DEADZONE && selectedCol < maxCols) {
-          setSelectedCol((prev) => Math.min(prev + 1, maxCols));
-        } else if (horizontalAxis < -DEADZONE && selectedCol > 0) {
-          setSelectedCol((prev) => Math.max(prev - 1, 0));
-        }
+    // Horizontal navigation (left/right) - only trigger on threshold crossing
+    const wasHorizontalNeutral = Math.abs(lastAxisStateRef.current.horizontal) <= DEADZONE;
+    if (wasHorizontalNeutral && Math.abs(horizontalAxis) > DEADZONE) {
+      const maxCols = keys[selectedRow].length - 1;
+      if (horizontalAxis > DEADZONE && selectedCol < maxCols) {
+        setSelectedCol((prev) => Math.min(prev + 1, maxCols));
+      } else if (horizontalAxis < -DEADZONE && selectedCol > 0) {
+        setSelectedCol((prev) => Math.max(prev - 1, 0));
       }
+    }
 
-      // Vertical navigation (up/down)
-      if (Math.abs(verticalAxis) > DEADZONE) {
-        if (verticalAxis > DEADZONE && selectedRow < keys.length - 1) {
-          setSelectedRow((prev) => {
-            const newRow = prev + 1;
-            const maxCols = keys[newRow].length - 1;
-            return newRow;
-          });
-          // Adjust column if out of bounds
-          setSelectedCol((prev) => Math.min(prev, keys[selectedRow + 1].length - 1));
-        } else if (verticalAxis < -DEADZONE && selectedRow > 0) {
-          setSelectedRow((prev) => {
-            const newRow = prev - 1;
-            return newRow;
-          });
-          // Adjust column if out of bounds
-          setSelectedCol((prev) => Math.min(prev, keys[selectedRow - 1].length - 1));
-        }
+    // Vertical navigation (up/down) - only trigger on threshold crossing
+    const wasVerticalNeutral = Math.abs(lastAxisStateRef.current.vertical) <= DEADZONE;
+    if (wasVerticalNeutral && Math.abs(verticalAxis) > DEADZONE) {
+      if (verticalAxis > DEADZONE && selectedRow < keys.length - 1) {
+        setSelectedRow((prev) => {
+          const newRow = prev + 1;
+          setSelectedCol((col) => Math.min(col, keys[newRow].length - 1));
+          return newRow;
+        });
+      } else if (verticalAxis < -DEADZONE && selectedRow > 0) {
+        setSelectedRow((prev) => {
+          const newRow = prev - 1;
+          setSelectedCol((col) => Math.min(col, keys[newRow].length - 1));
+          return newRow;
+        });
       }
+    }
 
-      // A button (index 0) - select key
-      if (gamepadState.buttonPressed && gamepadState.buttonIndex === 0) {
-        handleKeySelect();
-      }
+    // Update axis state
+    lastAxisStateRef.current = { horizontal: horizontalAxis, vertical: verticalAxis };
 
-      // B button (index 1) - close keyboard
-      if (gamepadState.buttonPressed && gamepadState.buttonIndex === 1) {
-        onClose();
-      }
-    };
+    // A button (index 0) - select key (only on press, not hold)
+    const isAPressed = gamepadState.buttonPressed && gamepadState.buttonIndex === 0;
+    if (isAPressed && !lastButtonStateRef.current.a) {
+      handleKeySelect();
+    }
+    lastButtonStateRef.current.a = isAPressed;
 
-    handleGamepadInput();
+    // B button (index 1) - close keyboard (only on press, not hold)
+    const isBPressed = gamepadState.buttonPressed && gamepadState.buttonIndex === 1;
+    if (isBPressed && !lastButtonStateRef.current.b) {
+      onClose();
+    }
+    lastButtonStateRef.current.b = isBPressed;
   }, [
     gamepadState.axes,
     gamepadState.buttonPressed,

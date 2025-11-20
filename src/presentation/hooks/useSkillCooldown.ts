@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { SkillState } from '../../domain/entities/SkillState';
 import { TrackSkillCooldown } from '../../application/useCases/TrackSkillCooldown';
 
@@ -36,9 +36,17 @@ export const useSkillCooldown = ({
     );
   });
 
-  const trackSkillCooldown = new TrackSkillCooldown();
+  // Memoize TrackSkillCooldown to prevent recreation on every render
+  const trackSkillCooldown = useMemo(() => new TrackSkillCooldown(), []);
   const previousStateRef = useRef(skillState);
   const lastTickTimeRef = useRef(performance.now());
+  const skillStateRef = useRef(skillState);
+  const announcementTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Keep skillStateRef in sync with latest state
+  useEffect(() => {
+    skillStateRef.current = skillState;
+  }, [skillState]);
 
   // State for ARIA announcements
   const [announcement, setAnnouncement] = useState<string>('');
@@ -74,8 +82,8 @@ export const useSkillCooldown = ({
         trackSkillCooldown.updateCooldown(current, deltaTime)
       );
 
-      // Continue ticking if still on cooldown
-      if (skillState.isOnCooldown()) {
+      // Use ref to get current state, preventing stale closure
+      if (skillStateRef.current.isOnCooldown()) {
         animationFrameId = requestAnimationFrame(tick);
       }
     };
@@ -133,11 +141,21 @@ export const useSkillCooldown = ({
       setAnnouncement(announcementText);
       setShouldAnnounce(true);
 
-      // Reset announce flag after announcement
-      setTimeout(() => setShouldAnnounce(false), 100);
+      // Clear previous timeout and set new one
+      if (announcementTimeoutRef.current) {
+        clearTimeout(announcementTimeoutRef.current);
+      }
+      announcementTimeoutRef.current = setTimeout(() => setShouldAnnounce(false), 100);
     }
 
     previousStateRef.current = skillState;
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (announcementTimeoutRef.current) {
+        clearTimeout(announcementTimeoutRef.current);
+      }
+    };
   }, [skillState, onReady, skillName, trackSkillCooldown]);
 
   // Get visual state for rendering

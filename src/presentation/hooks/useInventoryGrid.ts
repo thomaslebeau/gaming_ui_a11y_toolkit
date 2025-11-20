@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { InventoryState } from '../../domain/entities/InventoryState';
 import type { InventoryItem } from '../../domain/entities/InventoryState';
 import { NavigateInventoryGrid } from '../../application/useCases/NavigateInventoryGrid';
@@ -36,21 +36,12 @@ export const useInventoryGrid = ({
     InventoryState.create(rows, columns, items, wrapNavigation)
   );
 
-  const navigateUseCase = new NavigateInventoryGrid();
-  const adapterRef = useRef<BrowserInventoryAdapter | null>(null);
-  const gamepadAdapterRef = useRef<BrowserGamepadAdapter | null>(null);
+  // Memoize use case to prevent recreation on every render
+  const navigateUseCase = useMemo(() => new NavigateInventoryGrid(), []);
 
-  // Initialize adapters
-  if (!adapterRef.current) {
-    adapterRef.current = new BrowserInventoryAdapter();
-  }
-
-  if (!gamepadAdapterRef.current) {
-    gamepadAdapterRef.current = new BrowserGamepadAdapter();
-  }
-
-  const adapter = adapterRef.current;
-  const gamepadAdapter = gamepadAdapterRef.current;
+  // Memoize adapters to prevent recreation on every render
+  const adapter = useMemo(() => new BrowserInventoryAdapter(), []);
+  const gamepadAdapter = useMemo(() => new BrowserGamepadAdapter(), []);
 
   // Update items when they change
   useEffect(() => {
@@ -72,19 +63,19 @@ export const useInventoryGrid = ({
   // Navigation handlers
   const handleNavigateUp = useCallback(() => {
     setInventoryState((current) => navigateUseCase.navigateUp(current));
-  }, []);
+  }, [navigateUseCase]);
 
   const handleNavigateDown = useCallback(() => {
     setInventoryState((current) => navigateUseCase.navigateDown(current));
-  }, []);
+  }, [navigateUseCase]);
 
   const handleNavigateLeft = useCallback(() => {
     setInventoryState((current) => navigateUseCase.navigateLeft(current));
-  }, []);
+  }, [navigateUseCase]);
 
   const handleNavigateRight = useCallback(() => {
     setInventoryState((current) => navigateUseCase.navigateRight(current));
-  }, []);
+  }, [navigateUseCase]);
 
   // Select/Move handler
   const handleSelect = useCallback(() => {
@@ -123,7 +114,7 @@ export const useInventoryGrid = ({
 
       return newState;
     });
-  }, [onItemSelect, onItemMove, adapter]);
+  }, [onItemSelect, onItemMove, adapter, navigateUseCase]);
 
   // Cancel move handler
   const handleCancelMove = useCallback(() => {
@@ -134,7 +125,7 @@ export const useInventoryGrid = ({
       }
       return current;
     });
-  }, [adapter]);
+  }, [adapter, navigateUseCase]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -263,7 +254,8 @@ export const useInventoryGrid = ({
       adapter.cleanup();
       gamepadAdapter.cleanup();
     };
-  }, [adapter, gamepadAdapter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - cleanup only on unmount
 
   return {
     focusedIndex: inventoryState.focusedIndex,

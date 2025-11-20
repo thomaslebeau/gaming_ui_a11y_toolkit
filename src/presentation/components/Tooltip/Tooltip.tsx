@@ -56,6 +56,7 @@ export const Tooltip = ({
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const showTimeoutRef = useRef<NodeJS.Timeout>();
   const hideTimeoutRef = useRef<NodeJS.Timeout>();
+  const isMountedRef = useRef(true);
 
   // Update tooltip position
   const updatePosition = useCallback(() => {
@@ -78,7 +79,9 @@ export const Tooltip = ({
     }
 
     showTimeoutRef.current = setTimeout(() => {
-      setIsVisible(true);
+      if (isMountedRef.current) {
+        setIsVisible(true);
+      }
     }, delay);
   }, [delay]);
 
@@ -91,7 +94,9 @@ export const Tooltip = ({
 
     // Small delay on hide for better UX when moving between elements
     hideTimeoutRef.current = setTimeout(() => {
-      setIsVisible(false);
+      if (isMountedRef.current) {
+        setIsVisible(false);
+      }
     }, 100);
   }, []);
 
@@ -131,7 +136,9 @@ export const Tooltip = ({
 
   // Cleanup timeouts on unmount
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
+      isMountedRef.current = false;
       if (showTimeoutRef.current) {
         clearTimeout(showTimeoutRef.current);
       }
