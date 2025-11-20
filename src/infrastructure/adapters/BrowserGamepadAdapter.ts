@@ -1,86 +1,93 @@
 import { GamepadState } from '../../domain/entities/GamepadState';
 import type { IGamepadRepository } from '../../domain/ports/IGamepadRepository';
 
-// Concrete implementation using browser Gamepad API
 export class BrowserGamepadAdapter implements IGamepadRepository {
-  private currentState: GamepadState = GamepadState.createDisconnected();
-  private animationFrameId: number | null = null;
-  private connectHandler: ((e: GamepadEvent) => void) | null = null;
-  private disconnectHandler: (() => void) | null = null;
+  // Stockage des références exactes pour pouvoir les supprimer (removeEventListener)
+  private handleConnect: (e: GamepadEvent) => void;
+  private handleDisconnect: (e: GamepadEvent) => void;
 
-  onConnect(callback: (state: GamepadState) => void): void {
-    // Remove previous handler if exists
-    if (this.connectHandler) {
-      window.removeEventListener('gamepadconnected', this.connectHandler);
-    }
+  // Callbacks de l'application
+  private onConnectCallback: ((state: GamepadState) => void) | null = null;
+  private onDisconnectCallback: (() => void) | null = null;
 
-    this.connectHandler = (e: GamepadEvent) => {
-      console.log('🎮 Adapter: gamepad connected -', e.gamepad.id);
-      this.currentState = GamepadState.createConnected();
-      callback(this.currentState);
+  constructor() {
+    console.log('init BrowserGamepadAdapter')
+    // 1. On prépare les handlers une seule fois avec le bon contexte 'this'
+    this.handleConnect = (e: GamepadEvent) => {
+      console.log('🎮 Adapter: Connected', e.gamepad.id);
+      if (this.onConnectCallback) {
+        // Important : On utilise la version corrigée de l'entité
+        this.onConnectCallback(GamepadState.fromGamepad(e.gamepad));
+      }
     };
 
-    window.addEventListener('gamepadconnected', this.connectHandler);
+    this.handleDisconnect = () => {
+      console.log('🎮 Adapter: Disconnected');
+      if (this.onDisconnectCallback) {
+        this.onDisconnectCallback();
+      }
+    };
+
+    // 2. On active l'écoute globale immédiatement
+    this.startListening();
+  }
+
+  private startListening(): void {
+    window.addEventListener('gamepadconnected', this.handleConnect);
+    window.addEventListener('gamepaddisconnected', this.handleDisconnect);
+  }
+
+  onConnect(callback: (state: GamepadState) => void): void {
+    this.onConnectCallback = callback;
+    console.log("on Connect");
+    
+    // Vérification immédiate au cas où la manette est déjà là avant le chargement de la page
+    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+    const gamepad = gamepads[0];
+    if (gamepad && gamepad.connected) {
+      callback(GamepadState.fromGamepad(gamepad));
+    }
   }
 
   onDisconnect(callback: () => void): void {
-    // Remove previous handler if exists
-    if (this.disconnectHandler) {
-      window.removeEventListener('gamepaddisconnected', this.disconnectHandler);
-    }
-
-    this.disconnectHandler = () => {
-      console.log('🎮 Adapter: gamepad disconnected');
-      this.currentState = GamepadState.createDisconnected();
-      callback();
-    };
-
-    window.addEventListener('gamepaddisconnected', this.disconnectHandler);
+    this.onDisconnectCallback = callback;
   }
 
-  pollButtons(callback: (state: GamepadState) => void): void {
+  // Votre excellente idée : retourner une fonction d'arrêt spécifique au polling
+  pollButtons(callback: (state: GamepadState) => void): () => void {
+    let animationId: number;
+    let isPolling = true;
+
     const poll = () => {
-      const gamepads = navigator.getGamepads();
-      const gamepad = gamepads[0]; // Use first connected gamepad
+      if (!isPolling) return;
 
-      if (gamepad && this.currentState.connected) {
-        // Check A button (index 0 on most gamepads)
-        const aButton = gamepad.buttons[0];
+      const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+      const gamepad = gamepads[0];
 
-        if (aButton.pressed && !this.currentState.buttonPressed) {
-          // Button just pressed
-          this.currentState = this.currentState.withButtonPress(0);
-          callback(this.currentState);
-        } else if (!aButton.pressed && this.currentState.buttonPressed) {
-          // Button just released
-          this.currentState = this.currentState.withButtonRelease();
-          callback(this.currentState);
-        }
+      if (gamepad && gamepad.connected) {
+        // C'est ICI que la magie opère grâce à GamepadState corrigé
+        const state = GamepadState.fromGamepad(gamepad);
+        callback(state);
       }
 
-      this.animationFrameId = requestAnimationFrame(poll);
+      animationId = requestAnimationFrame(poll);
     };
 
-    this.animationFrameId = requestAnimationFrame(poll);
+    poll();
+
+    // Cleanup function pour le polling uniquement
+    return () => {
+      isPolling = false;
+      cancelAnimationFrame(animationId);
+    };
   }
 
+  // Nettoyage global (quand on quitte l'application ou le module)
   cleanup(): void {
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
-
-    // Remove event listeners to prevent memory leaks
-    if (this.connectHandler) {
-      window.removeEventListener('gamepadconnected', this.connectHandler);
-      this.connectHandler = null;
-    }
-
-    if (this.disconnectHandler) {
-      window.removeEventListener('gamepaddisconnected', this.disconnectHandler);
-      this.disconnectHandler = null;
-    }
-
-    console.log('🎮 Adapter: cleanup');
+    window.removeEventListener('gamepadconnected', this.handleConnect);
+    window.removeEventListener('gamepaddisconnected', this.handleDisconnect);
+    this.onConnectCallback = null;
+    this.onDisconnectCallback = null;
+    console.log('🎮 Adapter: Global cleanup done');
   }
 }

@@ -182,7 +182,20 @@ function App() {
         </p>
       </div>
 
-      <div style={{ textAlign: "center" }}>
+      <GameButton onClick={handleClick} ariaLabel="Action button">
+        Press Me
+      </GameButton>
+      <GameButton onClick={handleClick} ariaLabel="Action button 2">
+        Press Me 2
+      </GameButton>
+
+      <GameMenu
+        items={menuItems}
+        defaultFocusIndex={0}
+        ariaLabel="Main game menu"
+      />
+
+      {/* <div style={{ textAlign: "center" }}>
         <h2>InventoryGrid Demo</h2>
         <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
           Navigate with arrows/D-pad. Press Enter/A to move items. Navigate to
@@ -232,7 +245,7 @@ function App() {
           <br />
           Player moves in a circle to demonstrate nearby POI detection.
         </p>
-        {/* <div style={{ position: "relative", height: "15rem" }}>
+        <div style={{ position: "relative", height: "15rem" }}>
           <Minimap
             width={15}
             height={15}
@@ -245,8 +258,8 @@ function App() {
             ariaLabel="Game minimap showing nearby enemies and objectives"
             enableAudioPings={true}
           />
-        </div> */}
-      </div>
+        </div>
+      </div> */}
     </div>
   );
 }

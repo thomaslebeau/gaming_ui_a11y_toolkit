@@ -3,14 +3,13 @@ import { GamepadState } from '../../domain/entities/GamepadState';
 import { DetectGamepadConnection } from '../../application/useCases/DetectGamepadConnection';
 import { BrowserGamepadAdapter } from '../../infrastructure/adapters/BrowserGamepadAdapter';
 
-// Hook acts as a controller - bridges React with use cases
 export const useGamepad = (onButtonPress?: () => void) => {
   const [gamepadState, setGamepadState] = useState<GamepadState>(
     GamepadState.createDisconnected()
   );
 
   useEffect(() => {
-    // Dependency injection: create adapter and use case
+    // Create instances inside useEffect to ensure single creation
     const adapter = new BrowserGamepadAdapter();
     const useCase = new DetectGamepadConnection(adapter);
 
@@ -31,7 +30,7 @@ export const useGamepad = (onButtonPress?: () => void) => {
 
     // Cleanup on unmount
     return cleanup;
-  }, [onButtonPress]);
+  }, []); // Empty deps if onButtonPress doesn't need to be reactive
 
   return gamepadState;
 };
