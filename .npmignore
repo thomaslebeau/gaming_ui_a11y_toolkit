@@ -1,0 +1,56 @@
+# Source files
+src/
+public/
+
+# Config files
+.eslintrc*
+.prettierrc*
+tsconfig*.json
+vite.config.ts
+*.config.js
+*.config.ts
+
+# Development files
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation source (keep only README.md)
+docs/
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+coverage/
+
+# Build artifacts that shouldn't be published
+node_modules/
+dist-test/
+
+# Development demo files
+index.html
+src/main.tsx
+src/App.tsx
+src/App.css
