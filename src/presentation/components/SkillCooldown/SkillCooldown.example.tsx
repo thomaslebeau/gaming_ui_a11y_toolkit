@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SkillCooldown } from './SkillCooldown';
 import { useSkillCooldown } from '../../hooks/useSkillCooldown';
-import { BrowserGamepadAdapter } from '../../../infrastructure/adapters/BrowserGamepadAdapter';
-import { DetectGamepadConnection } from '../../../application/useCases/DetectGamepadConnection';
+import { useGamepadContext } from '../../contexts/GamepadContext';
 
 /**
  * Example demonstrating the SkillCooldown component with full features:
@@ -73,11 +72,10 @@ export const SkillCooldownExample = () => {
     healSkill.activate();
   };
 
-  // Gamepad support - map gamepad buttons to skills
-  useEffect(() => {
-    const adapter = new BrowserGamepadAdapter();
-    const useCase = new DetectGamepadConnection(adapter);
+  // Gamepad support - map gamepad buttons to skills - utilise le Context centralisé
+  const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  useEffect(() => {
     const lastButtonState = {
       button0: false, // A/Cross - Fireball
       button1: false, // B/Circle - Dash
@@ -85,54 +83,52 @@ export const SkillCooldownExample = () => {
       button3: false, // Y/Triangle - Ultimate
     };
 
-    const cleanup = useCase.execute(
-      () => console.log('Gamepad connected'),
-      () => console.log('Gamepad disconnected'),
-      (gamepadState) => {
-        // Button 0 (A/Cross) - Fireball
-        if (gamepadState.buttonIndex === 0 && !lastButtonState.button0) {
-          lastButtonState.button0 = true;
-          if (fireballSkill.isReady && !fireballSkill.isDisabled) {
-            handleFireballCast();
-          }
-        } else if (gamepadState.buttonIndex !== 0) {
-          lastButtonState.button0 = false;
+    // S'abonne aux événements de pression de bouton via le Context centralisé
+    const unsubscribe = subscribeToButtonPress((gamepadState) => {
+      // Button 0 (A/Cross) - Fireball
+      if (gamepadState.buttonIndex === 0 && !lastButtonState.button0) {
+        lastButtonState.button0 = true;
+        if (fireballSkill.isReady && !fireballSkill.isDisabled) {
+          handleFireballCast();
         }
-
-        // Button 1 (B/Circle) - Dash
-        if (gamepadState.buttonIndex === 1 && !lastButtonState.button1) {
-          lastButtonState.button1 = true;
-          if (dashSkill.isReady && !dashSkill.isDisabled) {
-            handleDashCast();
-          }
-        } else if (gamepadState.buttonIndex !== 1) {
-          lastButtonState.button1 = false;
-        }
-
-        // Button 2 (X/Square) - Heal
-        if (gamepadState.buttonIndex === 2 && !lastButtonState.button2) {
-          lastButtonState.button2 = true;
-          if (healSkill.isReady && !healSkill.isDisabled) {
-            handleHealCast();
-          }
-        } else if (gamepadState.buttonIndex !== 2) {
-          lastButtonState.button2 = false;
-        }
-
-        // Button 3 (Y/Triangle) - Ultimate
-        if (gamepadState.buttonIndex === 3 && !lastButtonState.button3) {
-          lastButtonState.button3 = true;
-          if (ultimateSkill.isReady && !ultimateSkill.isDisabled) {
-            handleUltimateCast();
-          }
-        } else if (gamepadState.buttonIndex !== 3) {
-          lastButtonState.button3 = false;
-        }
+      } else if (gamepadState.buttonIndex !== 0) {
+        lastButtonState.button0 = false;
       }
-    );
 
-    return cleanup;
+      // Button 1 (B/Circle) - Dash
+      if (gamepadState.buttonIndex === 1 && !lastButtonState.button1) {
+        lastButtonState.button1 = true;
+        if (dashSkill.isReady && !dashSkill.isDisabled) {
+          handleDashCast();
+        }
+      } else if (gamepadState.buttonIndex !== 1) {
+        lastButtonState.button1 = false;
+      }
+
+      // Button 2 (X/Square) - Heal
+      if (gamepadState.buttonIndex === 2 && !lastButtonState.button2) {
+        lastButtonState.button2 = true;
+        if (healSkill.isReady && !healSkill.isDisabled) {
+          handleHealCast();
+        }
+      } else if (gamepadState.buttonIndex !== 2) {
+        lastButtonState.button2 = false;
+      }
+
+      // Button 3 (Y/Triangle) - Ultimate
+      if (gamepadState.buttonIndex === 3 && !lastButtonState.button3) {
+        lastButtonState.button3 = true;
+        if (ultimateSkill.isReady && !ultimateSkill.isDisabled) {
+          handleUltimateCast();
+        }
+      } else if (gamepadState.buttonIndex !== 3) {
+        lastButtonState.button3 = false;
+      }
+    });
+
+    return unsubscribe;
   }, [
+    subscribeToButtonPress,
     fireballSkill.isReady,
     fireballSkill.isDisabled,
     dashSkill.isReady,

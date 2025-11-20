@@ -3,7 +3,6 @@ import { MinimapState } from '../../domain/entities/MinimapState';
 import { POI, type Position } from '../../domain/entities/POI';
 import { UpdateMinimap } from '../../application/useCases/UpdateMinimap';
 import { BrowserMinimapAdapter } from '../../infrastructure/adapters/BrowserMinimapAdapter';
-import { DetectGamepadConnection } from '../../application/useCases/DetectGamepadConnection';
 import { useGamepadContext } from '../contexts/GamepadContext';
 
 interface UseMinimapOptions {
@@ -56,9 +55,6 @@ export const useMinimap = ({
   // Memoize use case and minimap adapter to prevent recreation on every render
   const updateUseCase = useMemo(() => new UpdateMinimap(), []);
   const adapter = useMemo(() => new BrowserMinimapAdapter(), []);
-
-  // Utilise l'adapter centralisé du Context pour le gamepad
-  const { adapter: gamepadAdapter } = useGamepadContext();
 
   // Track visibility state for interval
   const isVisibleRef = useRef(minimapState.isVisible);
@@ -243,10 +239,10 @@ export const useMinimap = ({
     minimapState.focusedPOIId,
   ]);
 
-  // Gamepad navigation
-  useEffect(() => {
-    const gamepadUseCase = new DetectGamepadConnection(gamepadAdapter);
+  // Gamepad navigation - utilise le Context centralisé
+  const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  useEffect(() => {
     let lastButtonState = {
       select: false,
       up: false,
@@ -254,60 +250,57 @@ export const useMinimap = ({
       a: false,
     };
 
-    const cleanup = gamepadUseCase.execute(
-      () => {}, // onConnected
-      () => {}, // onDisconnected
-      (gamepadState) => {
-        // Select button (button 8) - Toggle visibility
-        if (gamepadState.buttonIndex === 8 && !lastButtonState.select) {
-          lastButtonState.select = true;
-          handleToggleVisibility();
-        } else if (gamepadState.buttonIndex !== 8) {
-          lastButtonState.select = false;
-        }
-
-        // D-pad Up (button 12) - Focus previous POI
-        if (
-          gamepadState.buttonIndex === 12 &&
-          !lastButtonState.up &&
-          minimapState.isVisible
-        ) {
-          lastButtonState.up = true;
-          handleFocusPreviousPOI();
-        } else if (gamepadState.buttonIndex !== 12) {
-          lastButtonState.up = false;
-        }
-
-        // D-pad Down (button 13) - Focus next POI
-        if (
-          gamepadState.buttonIndex === 13 &&
-          !lastButtonState.down &&
-          minimapState.isVisible
-        ) {
-          lastButtonState.down = true;
-          handleFocusNextPOI();
-        } else if (gamepadState.buttonIndex !== 13) {
-          lastButtonState.down = false;
-        }
-
-        // A button (button 0) - Click focused POI
-        if (
-          gamepadState.buttonIndex === 0 &&
-          !lastButtonState.a &&
-          minimapState.isVisible &&
-          minimapState.focusedPOIId
-        ) {
-          lastButtonState.a = true;
-          handleFocusedPOIClick();
-        } else if (gamepadState.buttonIndex !== 0) {
-          lastButtonState.a = false;
-        }
+    // S'abonne aux événements de pression de bouton via le Context centralisé
+    const unsubscribe = subscribeToButtonPress((gamepadState) => {
+      // Select button (button 8) - Toggle visibility
+      if (gamepadState.buttonIndex === 8 && !lastButtonState.select) {
+        lastButtonState.select = true;
+        handleToggleVisibility();
+      } else if (gamepadState.buttonIndex !== 8) {
+        lastButtonState.select = false;
       }
-    );
 
-    return cleanup;
+      // D-pad Up (button 12) - Focus previous POI
+      if (
+        gamepadState.buttonIndex === 12 &&
+        !lastButtonState.up &&
+        minimapState.isVisible
+      ) {
+        lastButtonState.up = true;
+        handleFocusPreviousPOI();
+      } else if (gamepadState.buttonIndex !== 12) {
+        lastButtonState.up = false;
+      }
+
+      // D-pad Down (button 13) - Focus next POI
+      if (
+        gamepadState.buttonIndex === 13 &&
+        !lastButtonState.down &&
+        minimapState.isVisible
+      ) {
+        lastButtonState.down = true;
+        handleFocusNextPOI();
+      } else if (gamepadState.buttonIndex !== 13) {
+        lastButtonState.down = false;
+      }
+
+      // A button (button 0) - Click focused POI
+      if (
+        gamepadState.buttonIndex === 0 &&
+        !lastButtonState.a &&
+        minimapState.isVisible &&
+        minimapState.focusedPOIId
+      ) {
+        lastButtonState.a = true;
+        handleFocusedPOIClick();
+      } else if (gamepadState.buttonIndex !== 0) {
+        lastButtonState.a = false;
+      }
+    });
+
+    return unsubscribe;
   }, [
-    gamepadAdapter,
+    subscribeToButtonPress,
     handleToggleVisibility,
     handleFocusNextPOI,
     handleFocusPreviousPOI,

@@ -3,7 +3,6 @@ import { InventoryState } from '../../domain/entities/InventoryState';
 import type { InventoryItem } from '../../domain/entities/InventoryState';
 import { NavigateInventoryGrid } from '../../application/useCases/NavigateInventoryGrid';
 import { BrowserInventoryAdapter } from '../../infrastructure/adapters/BrowserInventoryAdapter';
-import { DetectGamepadConnection } from '../../application/useCases/DetectGamepadConnection';
 import { useGamepadContext } from '../contexts/GamepadContext';
 
 interface UseInventoryGridOptions {
@@ -41,9 +40,6 @@ export const useInventoryGrid = ({
 
   // Memoize inventory adapter to prevent recreation on every render
   const adapter = useMemo(() => new BrowserInventoryAdapter(), []);
-
-  // Utilise l'adapter centralisé du Context pour le gamepad
-  const { adapter: gamepadAdapter } = useGamepadContext();
 
   // Update items when they change
   useEffect(() => {
@@ -172,10 +168,10 @@ export const useInventoryGrid = ({
     handleCancelMove,
   ]);
 
-  // Gamepad navigation
-  useEffect(() => {
-    const gamepadUseCase = new DetectGamepadConnection(gamepadAdapter);
+  // Gamepad navigation - utilise le Context centralisé
+  const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  useEffect(() => {
     let lastButtonState = {
       up: false,
       down: false,
@@ -185,63 +181,60 @@ export const useInventoryGrid = ({
       b: false,
     };
 
-    const cleanup = gamepadUseCase.execute(
-      () => {}, // onConnected
-      () => {}, // onDisconnected
-      (gamepadState) => {
-        // D-pad Up (button 12)
-        if (gamepadState.buttonIndex === 12 && !lastButtonState.up) {
-          lastButtonState.up = true;
-          handleNavigateUp();
-        } else if (gamepadState.buttonIndex !== 12) {
-          lastButtonState.up = false;
-        }
-
-        // D-pad Down (button 13)
-        if (gamepadState.buttonIndex === 13 && !lastButtonState.down) {
-          lastButtonState.down = true;
-          handleNavigateDown();
-        } else if (gamepadState.buttonIndex !== 13) {
-          lastButtonState.down = false;
-        }
-
-        // D-pad Left (button 14)
-        if (gamepadState.buttonIndex === 14 && !lastButtonState.left) {
-          lastButtonState.left = true;
-          handleNavigateLeft();
-        } else if (gamepadState.buttonIndex !== 14) {
-          lastButtonState.left = false;
-        }
-
-        // D-pad Right (button 15)
-        if (gamepadState.buttonIndex === 15 && !lastButtonState.right) {
-          lastButtonState.right = true;
-          handleNavigateRight();
-        } else if (gamepadState.buttonIndex !== 15) {
-          lastButtonState.right = false;
-        }
-
-        // A button (button 0) - Select/Move
-        if (gamepadState.buttonIndex === 0 && !lastButtonState.a) {
-          lastButtonState.a = true;
-          handleSelect();
-        } else if (gamepadState.buttonIndex !== 0) {
-          lastButtonState.a = false;
-        }
-
-        // B button (button 1) - Cancel move
-        if (gamepadState.buttonIndex === 1 && !lastButtonState.b) {
-          lastButtonState.b = true;
-          handleCancelMove();
-        } else if (gamepadState.buttonIndex !== 1) {
-          lastButtonState.b = false;
-        }
+    // S'abonne aux événements de pression de bouton via le Context centralisé
+    const unsubscribe = subscribeToButtonPress((gamepadState) => {
+      // D-pad Up (button 12)
+      if (gamepadState.buttonIndex === 12 && !lastButtonState.up) {
+        lastButtonState.up = true;
+        handleNavigateUp();
+      } else if (gamepadState.buttonIndex !== 12) {
+        lastButtonState.up = false;
       }
-    );
 
-    return cleanup;
+      // D-pad Down (button 13)
+      if (gamepadState.buttonIndex === 13 && !lastButtonState.down) {
+        lastButtonState.down = true;
+        handleNavigateDown();
+      } else if (gamepadState.buttonIndex !== 13) {
+        lastButtonState.down = false;
+      }
+
+      // D-pad Left (button 14)
+      if (gamepadState.buttonIndex === 14 && !lastButtonState.left) {
+        lastButtonState.left = true;
+        handleNavigateLeft();
+      } else if (gamepadState.buttonIndex !== 14) {
+        lastButtonState.left = false;
+      }
+
+      // D-pad Right (button 15)
+      if (gamepadState.buttonIndex === 15 && !lastButtonState.right) {
+        lastButtonState.right = true;
+        handleNavigateRight();
+      } else if (gamepadState.buttonIndex !== 15) {
+        lastButtonState.right = false;
+      }
+
+      // A button (button 0) - Select/Move
+      if (gamepadState.buttonIndex === 0 && !lastButtonState.a) {
+        lastButtonState.a = true;
+        handleSelect();
+      } else if (gamepadState.buttonIndex !== 0) {
+        lastButtonState.a = false;
+      }
+
+      // B button (button 1) - Cancel move
+      if (gamepadState.buttonIndex === 1 && !lastButtonState.b) {
+        lastButtonState.b = true;
+        handleCancelMove();
+      } else if (gamepadState.buttonIndex !== 1) {
+        lastButtonState.b = false;
+      }
+    });
+
+    return unsubscribe;
   }, [
-    gamepadAdapter,
+    subscribeToButtonPress,
     handleNavigateUp,
     handleNavigateDown,
     handleNavigateLeft,

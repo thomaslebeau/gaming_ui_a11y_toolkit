@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { MenuState } from "../../domain/entities/MenuState";
 import { NavigateMenu } from "../../application/useCases/NavigateMenu";
-import { DetectGamepadConnection } from "../../application/useCases/DetectGamepadConnection";
 import { useGamepadContext } from "../contexts/GamepadContext";
 
 /**
@@ -50,38 +49,33 @@ export const useMenuNavigation = (
   }, [handleNavigateUp, handleNavigateDown]);
 
   // Gamepad navigation (D-pad Up = button 12, D-pad Down = button 13)
-  // Utilise l'adapter centralisé du Context
-  const { adapter } = useGamepadContext();
+  // Utilise le Context centralisé
+  const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
   useEffect(() => {
-    const useCase = new DetectGamepadConnection(adapter);
-
     let lastButtonState = { up: false, down: false };
 
-    const cleanup = useCase.execute(
-      () => {}, // onConnected
-      () => {}, // onDisconnected
-      (gamepadState) => {
-        // D-pad Up (button 12)
-        if (gamepadState.buttonIndex === 12 && !lastButtonState.up) {
-          lastButtonState.up = true;
-          handleNavigateUp();
-        } else if (gamepadState.buttonIndex !== 12) {
-          lastButtonState.up = false;
-        }
-
-        // D-pad Down (button 13)
-        if (gamepadState.buttonIndex === 13 && !lastButtonState.down) {
-          lastButtonState.down = true;
-          handleNavigateDown();
-        } else if (gamepadState.buttonIndex !== 13) {
-          lastButtonState.down = false;
-        }
+    // S'abonne aux événements de pression de bouton via le Context centralisé
+    const unsubscribe = subscribeToButtonPress((gamepadState) => {
+      // D-pad Up (button 12)
+      if (gamepadState.buttonIndex === 12 && !lastButtonState.up) {
+        lastButtonState.up = true;
+        handleNavigateUp();
+      } else if (gamepadState.buttonIndex !== 12) {
+        lastButtonState.up = false;
       }
-    );
 
-    return cleanup;
-  }, [handleNavigateUp, handleNavigateDown, adapter]);
+      // D-pad Down (button 13)
+      if (gamepadState.buttonIndex === 13 && !lastButtonState.down) {
+        lastButtonState.down = true;
+        handleNavigateDown();
+      } else if (gamepadState.buttonIndex !== 13) {
+        lastButtonState.down = false;
+      }
+    });
+
+    return unsubscribe;
+  }, [handleNavigateUp, handleNavigateDown, subscribeToButtonPress]);
 
   return {
     focusedIndex: menuState.focusedIndex,
