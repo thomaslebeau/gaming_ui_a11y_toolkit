@@ -1,0 +1,173 @@
+/* Container for the minimap component */
+.minimapContainer {
+  position: fixed;
+  top: var(--spacing-20);
+  right: var(--spacing-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  z-index: var(--z-index-dropdown);
+  opacity: 0.9;
+  transition: opacity var(--duration-base) var(--timing-ease-in-out);
+
+  /* Performance optimizations */
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.minimapContainer:hover {
+  opacity: 1;
+}
+
+/* Canvas element for rendering the map */
+.minimapCanvas {
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  border: var(--border-width-base) solid var(--color-border-dark);
+  background: var(--color-dark-bg-darker);
+
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Focus indicator for keyboard navigation */
+.minimapCanvas:focus-visible {
+  outline: var(--outline-width-base) solid var(--color-focus-gaming);
+  outline-offset: var(--outline-offset-base);
+  box-shadow: var(--shadow-lg), var(--glow-gaming-base);
+}
+
+/* Controls panel below the minimap */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--padding-tooltip-vertical) var(--padding-tooltip-horizontal);
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-white);
+  gap: var(--gap-sm);
+  backdrop-filter: blur(0.5rem);
+}
+
+/* Zoom level indicator */
+.zoomIndicator {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-focus-gaming);
+}
+
+/* Hint text for controls */
+.hint {
+  color: var(--color-neutral-400);
+  font-size: var(--font-size-xs);
+}
+
+/* Screen reader only content */
+.srOnly {
+  position: absolute;
+  width: var(--spacing-1);
+  height: var(--spacing-1);
+  padding: 0;
+  margin: calc(-1 * var(--spacing-1));
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .minimapContainer {
+    transition: none;
+  }
+
+  .minimapCanvas {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .minimapCanvas {
+    border: var(--border-width-thick) solid #fff;
+    box-shadow: none;
+  }
+
+  .controls {
+    background: #000;
+    border: var(--border-width-base) solid #fff;
+  }
+
+  .zoomIndicator {
+    color: #0ff;
+  }
+
+  .hint {
+    color: #fff;
+  }
+
+  .minimapCanvas:focus-visible {
+    outline: var(--outline-width-thick) solid #0ff;
+    box-shadow: none;
+  }
+}
+
+/* Dark mode support (already optimized for dark) */
+@media (prefers-color-scheme: dark) {
+  .minimapCanvas {
+    border-color: var(--color-border-dark);
+  }
+
+  .controls {
+    background: rgba(0, 0, 0, 0.9);
+  }
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 30rem) {
+  .minimapContainer {
+    top: var(--spacing-12);
+    right: var(--spacing-12);
+  }
+
+  .controls {
+    font-size: 0.625rem; /* 10px */
+    padding: var(--spacing-4) var(--spacing-8);
+  }
+}
+
+/* Animation for POI pings */
+@keyframes poiPing {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Accessibility: Ensure sufficient color contrast */
+.minimapCanvas {
+  /* Force hardware acceleration for smooth rendering */
+  transform: translate3d(0, 0, 0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Print styles: Hide minimap when printing */
+@media print {
+  .minimapContainer {
+    display: none;
+  }
+}

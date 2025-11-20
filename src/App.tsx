@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GameButton } from "./presentation/components/GameButton";
 import { GameMenu } from "./presentation/components/GameMenu";
 import { InventoryGrid } from "./presentation/components/InventoryGrid";
+import { Minimap } from "./presentation/components/Minimap";
 import type { InventoryItem } from "./domain/entities/InventoryState";
 
 function App() {
@@ -102,6 +103,65 @@ function App() {
     });
   };
 
+  // Minimap demo state - simulate player movement
+  const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
+  const [playerRotation, setPlayerRotation] = useState(0);
+
+  // Sample POIs for minimap
+  const pointsOfInterest = [
+    {
+      id: "enemy1",
+      type: "enemy" as const,
+      position: { x: 30, y: 20 },
+      label: "Goblin Scout",
+    },
+    {
+      id: "enemy2",
+      type: "enemy" as const,
+      position: { x: -25, y: 35 },
+      label: "Orc Warrior",
+    },
+    {
+      id: "objective1",
+      type: "objective" as const,
+      position: { x: 50, y: -30 },
+      label: "Ancient Artifact",
+    },
+    {
+      id: "waypoint1",
+      type: "waypoint" as const,
+      position: { x: -40, y: -20 },
+      label: "Camp Site",
+    },
+    {
+      id: "ally1",
+      type: "ally" as const,
+      position: { x: 10, y: -15 },
+      label: "Friendly NPC",
+    },
+  ];
+
+  // Simulate player movement in a circle
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlayerPosition((prev) => {
+        const angle = (Date.now() / 1000) % (2 * Math.PI);
+        return {
+          x: Math.cos(angle) * 15,
+          y: Math.sin(angle) * 15,
+        };
+      });
+      setPlayerRotation((prev) => (prev + 2) % 360);
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handlePOIClick = (poi: any) => {
+    console.log("POI clicked:", poi);
+    alert(`Pinged: ${poi.label}`);
+  };
+
   return (
     <div
       style={{
@@ -158,6 +218,29 @@ function App() {
           <GameButton onClick={handleClick} disabled>
             Disabled Button
           </GameButton>
+        </div>
+      </div>
+
+      <div style={{ textAlign: "center", marginBottom: "10rem" }}>
+        <h2>Minimap Demo</h2>
+        <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
+          Press <strong>M</strong> to toggle minimap. Use <strong>+/-</strong> to zoom, <strong>Tab</strong> to navigate POIs, <strong>Enter</strong> to select.
+          <br />
+          Player moves in a circle to demonstrate nearby POI detection.
+        </p>
+        <div style={{ position: "relative", height: "15rem" }}>
+          <Minimap
+            width={15}
+            height={15}
+            playerPosition={playerPosition}
+            playerRotation={playerRotation}
+            pointsOfInterest={pointsOfInterest}
+            zoom={1.0}
+            rotateWithPlayer={true}
+            onPOIClick={handlePOIClick}
+            ariaLabel="Game minimap showing nearby enemies and objectives"
+            enableAudioPings={true}
+          />
         </div>
       </div>
     </div>
