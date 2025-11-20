@@ -5,6 +5,7 @@
 [![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![npm](https://img.shields.io/npm/v/gaming-ui-a11y-toolkit)](https://www.npmjs.com/package/gaming-ui-a11y-toolkit)
 
 ## 📋 Table of Contents
 
@@ -13,402 +14,150 @@
 - [Installation](#-installation)
 - [Available Components](#-available-components)
 - [Custom Hooks](#-custom-hooks)
-- [Architecture](#-architecture)
-- [Design Tokens System](#-design-tokens-system)
 - [Usage](#-usage)
+- [API Reference](#-api-reference)
 - [Development](#-development)
 - [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🎯 About
 
-**Gaming UI A11y Toolkit** is a React component library specifically designed to create accessible game interfaces. It combines accessibility best practices (WCAG) with modern gaming experience, offering complete support for:
+**Gaming UI A11y Toolkit** is a React component library specifically designed to create accessible game interfaces. It combines accessibility best practices (WCAG 2.1 AA) with modern gaming experience, offering complete support for:
 
 - ⌨️ **Keyboard navigation** (arrow keys, Enter, Space, Escape)
 - 🎮 **Gamepad support** (D-pad, A/B buttons via Gamepad API)
+- 🕹️ **Joystick navigation** (left analog stick)
 - 🔊 **Screen readers** (ARIA announcements, semantic roles)
-- 🎨 **Accessible themes** (high contrast mode, color blindness)
-- ♿ **WCAG compliance** (visible focus, target sizes, focus management)
+- ♿ **WCAG 2.1 AA compliance** (visible focus, focus management)
+- 📳 **Haptic feedback** (gamepad vibration)
 
 This library is ideal for developing inclusive web games, accessible game menus, or any interface requiring gamepad navigation.
 
 ## ✨ Features
 
-### Complete accessibility
+### Complete Accessibility
 - Smooth keyboard and gamepad navigation
 - Voice announcements for screen readers
-- Smart focus management with focus trap
+- Intelligent focus management
 - Visual focus indicators with gaming effects
-- High contrast mode support
+- Gamepad haptic feedback support
 
-### Specialized gaming components
-- Game menu with vertical navigation
-- 2D inventory grid with item movement
-- Health bar with color zones (healthy/warning/critical)
-- Modal dialog boxes with focus trap
-- Intelligently positioned tooltips
-- Stylized gaming buttons
+### Specialized Gaming Components
+- Game button with haptic feedback
+- Game menu with vertical navigation (D-pad and joystick)
+- Full Gamepad API support
+- Automatic gamepad connection detection
 
-### Clean architecture
-- **Clean Architecture** pattern (Domain/Application/Infrastructure/Presentation)
-- Immutable and self-validating business entities
-- Dependency injection for maximum testability
-- Clear separation of concerns
+### Clean Architecture
 - Strict TypeScript for type safety
+- Reusable and composable components
+- Custom hooks for business logic
+- Unit tests included
 
-### Consistent design system
-- CSS design tokens for the entire visual palette
+### Consistent Design System
+- CSS tokens for complete visual palette
 - Customizable CSS variables
-- Dark and light themes
+- Light and dark themes
 - Smooth and performant animations
 
 ## 📦 Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/thomaslebeau/gaming_ui_a11y_toolkit.git
+npm install gaming-ui-a11y-toolkit
+```
 
-# Install dependencies
-cd gaming_ui_a11y_toolkit
-npm install
+or with yarn:
 
-# Run in development mode
-npm run dev
+```bash
+yarn add gaming-ui-a11y-toolkit
+```
 
-# Build for production
-npm run build
+or with pnpm:
+
+```bash
+pnpm add gaming-ui-a11y-toolkit
 ```
 
 ## 🧩 Available Components
 
 ### GameButton
-Basic action button with gamepad support.
+
+Basic action button with gamepad support and haptic feedback.
 
 ```tsx
-import { GameButton } from './presentation/components/GameButton';
+import { GameButton } from 'gaming-ui-a11y-toolkit';
 
-<GameButton onClick={handleClick} ariaLabel="Confirm">
-  Confirm
-</GameButton>
-```
-
-**Props:**
-- `onClick`: Function called on click
-- `disabled`: Disables the button
-- `ariaLabel`: Accessible label
-- `children`: Button content
-
----
-
-### HealthBar
-Visual health indicator with color-coded zones.
-
-```tsx
-import { HealthBar } from './presentation/components/HealthBar';
-
-<HealthBar
-  current={75}
-  max={100}
-  label="Player health"
-  showValue={true}
-  showPercentage={true}
-/>
-```
-
-**Props:**
-- `current`: Current health value
-- `max`: Maximum value
-- `label`: Label for accessibility
-- `showValue`: Display numeric value
-- `showPercentage`: Display percentage
-
-**Color zones:**
-- 🟢 **Healthy**: > 50%
-- 🟡 **Warning**: 20-50%
-- 🔴 **Critical**: < 20%
-
----
-
-### GameMenu
-Vertical menu with gamepad and keyboard navigation.
-
-```tsx
-import { GameMenu } from './presentation/components/GameMenu';
-
-const menuItems = [
-  { id: 'start', label: 'New Game', onClick: startGame },
-  { id: 'load', label: 'Load Game', onClick: loadGame },
-  { id: 'options', label: 'Options', onClick: showOptions },
-  { id: 'quit', label: 'Quit', onClick: quitGame }
-];
-
-<GameMenu items={menuItems} ariaLabel="Main menu" />
-```
-
-**Navigation:**
-- ⬆️⬇️ Arrow keys or D-pad (buttons 12/13)
-- Circular navigation (wrap-around)
-- Enter/Space or A button to select
-
----
-
-### InventoryGrid
-Sophisticated 2D inventory grid system.
-
-```tsx
-import { InventoryGrid } from './presentation/components/InventoryGrid';
-
-const items = [
-  { id: '1', name: 'Sword', icon: '⚔️', x: 0, y: 0 },
-  { id: '2', name: 'Potion', icon: '🧪', x: 1, y: 0 }
-];
-
-<InventoryGrid
-  columns={4}
-  rows={3}
-  items={items}
-  onItemSelect={(item) => console.log('Selected:', item)}
-  onItemMove={(item, newX, newY) => moveItem(item, newX, newY)}
-  wrapNavigation={true}
-/>
-```
-
-**Navigation:**
-- ⬆️⬇️⬅️➡️ Arrow keys or D-pad (buttons 12-15)
-- Enter/Space or A button: select/place item
-- Escape or B button: cancel movement
-- Voice announcements for positions and items
-
----
-
-### DialogBox
-Modal dialog box with focus trap.
-
-```tsx
-import { DialogBox } from './presentation/components/DialogBox';
-
-<DialogBox
-  isOpen={isOpen}
-  onClose={handleClose}
-  title="Confirmation"
-  content="Are you sure you want to quit?"
-  characterName="System"
-  actions={[
-    { label: 'Yes', onClick: confirmQuit },
-    { label: 'No', onClick: handleClose }
-  ]}
+<GameButton
+  label="Start"
+  onClick={handleClick}
+  variant="primary"
+  size="large"
 />
 ```
 
 **Features:**
-- Focus trapped within dialog
-- Close with B button or Escape
-- Focus restoration on close
-- Body scroll prevention
+- WCAG 2.1 AA compliant
+- Keyboard navigation (Enter and Space)
+- Screen reader support
+- Gamepad haptic feedback
+- Visual states (pressed, disabled, focused)
 
 ---
 
-### Tooltip
-Accessible contextual tooltip.
+### GameMenu
+
+Vertical menu with keyboard, D-pad, and analog joystick navigation.
 
 ```tsx
-import { Tooltip } from './presentation/components/Tooltip';
+import { GameMenu } from 'gaming-ui-a11y-toolkit';
 
-<Tooltip content="This restores 50 health points" placement="top" delay={200}>
-  <button>Potion 🧪</button>
-</Tooltip>
+const menuItems = [
+  { id: 'start', label: 'New Game', onSelect: startGame },
+  { id: 'load', label: 'Load Game', onSelect: loadGame },
+  { id: 'options', label: 'Options', onSelect: showOptions },
+  { id: 'quit', label: 'Quit', onSelect: quitGame }
+];
+
+<GameMenu
+  title="Main Menu"
+  items={menuItems}
+  enableHapticFeedback={true}
+/>
 ```
 
-**Props:**
-- `content`: Tooltip content
-- `placement`: Position (`top`, `bottom`, `left`, `right`)
-- `delay`: Display delay in ms
-- `ariaLabel`: Accessible label
+**Navigation:**
+- ⬆️⬇️ Arrow keys to navigate
+- 🎮 D-pad (buttons 12/13) to navigate
+- 🕹️ Left joystick (Y axis) to navigate
+- Enter/Space or A button to select
+- Home/End to jump to start/end
+- Visual gamepad connected indicator
 
 ## 🎣 Custom Hooks
 
-### useGamepad
-Detects and manages connected gamepads.
+### useGamepadNavigation
+
+Manages keyboard and gamepad navigation for menus.
 
 ```tsx
-import { useGamepad } from './presentation/hooks/useGamepad';
+import { useGamepadNavigation } from 'gaming-ui-a11y-toolkit';
 
-const gamepad = useGamepad((button) => {
-  console.log('Button pressed:', button);
-});
-
-// gamepad.isConnected, gamepad.buttons, gamepad.axes
-```
-
----
-
-### useMenuNavigation
-Vertical navigation for menus.
-
-```tsx
-import { useMenuNavigation } from './presentation/hooks/useMenuNavigation';
-
-const { focusedIndex, isFocused } = useMenuNavigation(items.length);
-```
-
----
-
-### useInventoryGrid
-Complex 2D navigation for inventory grids.
-
-```tsx
-import { useInventoryGrid } from './presentation/hooks/useInventoryGrid';
-
-const {
-  focusedIndex,
-  focusedPosition,
-  isFocused,
-  isMovingItem,
-  isMoveSource,
-  getItemAt
-} = useInventoryGrid({
-  columns: 4,
-  rows: 3,
-  items,
-  onItemSelect,
-  onItemMove,
-  wrapNavigation: true
+const { selectedIndex, isGamepadConnected, setSelectedIndex } = useGamepadNavigation({
+  itemCount: items.length,
+  initialIndex: 0,
+  onSelectionChange: (index) => console.log('Selected:', index),
+  onActivate: (index) => console.log('Activated:', index),
+  enableHapticFeedback: true,
+  joystickDeadzone: 0.5
 });
 ```
 
----
-
-### useDialogFocus
-Focus management for modal dialogs.
-
-```tsx
-import { useDialogFocus } from './presentation/hooks/useDialogFocus';
-
-const dialogRef = useDialogFocus(isOpen, onClose);
-
-<div ref={dialogRef} role="dialog">...</div>
-```
-
-## 🏗️ Architecture
-
-The project follows the **Clean Architecture** pattern with clear separation of concerns:
-
-```
-┌─────────────────────────────────────────────┐
-│         Presentation Layer (React)          │
-│  Components │ Hooks │ UI Logic              │
-└────────────────────┬────────────────────────┘
-                     │
-┌────────────────────┴────────────────────────┐
-│      Infrastructure Layer (Adapters)        │
-│  Browser APIs │ Gamepad │ Focus Management  │
-└────────────────────┬────────────────────────┘
-                     │
-┌────────────────────┴────────────────────────┐
-│      Application Layer (Use Cases)          │
-│  Orchestration │ Business Workflows         │
-└────────────────────┬────────────────────────┘
-                     │
-┌────────────────────┴────────────────────────┐
-│         Domain Layer (Entities)             │
-│  Business Logic │ Pure Functions │ No deps  │
-└─────────────────────────────────────────────┘
-```
-
-### Folder Structure
-
-```
-src/
-├── domain/                     # Pure business logic
-│   ├── entities/               # Immutable business objects
-│   │   ├── HealthState.ts      # Health calculations
-│   │   ├── MenuState.ts        # Menu navigation state
-│   │   ├── InventoryState.ts   # 2D grid state
-│   │   ├── GamepadState.ts     # Gamepad state
-│   │   └── DialogState.ts      # Dialog state
-│   └── ports/                  # Interfaces (contracts)
-│       ├── IGamepadRepository.ts
-│       └── IFocusRepository.ts
-│
-├── application/
-│   └── useCases/               # Orchestrating use cases
-│       ├── DetectGamepadConnection.ts
-│       ├── NavigateMenu.ts
-│       ├── NavigateInventoryGrid.ts
-│       └── ManageDialogFocus.ts
-│
-├── infrastructure/
-│   └── adapters/               # Concrete implementations
-│       ├── BrowserGamepadAdapter.ts
-│       ├── BrowserFocusAdapter.ts
-│       └── BrowserInventoryAdapter.ts
-│
-└── presentation/               # React layer
-    ├── components/             # UI components
-    │   ├── GameButton/
-    │   ├── HealthBar/
-    │   ├── GameMenu/
-    │   ├── InventoryGrid/
-    │   ├── DialogBox/
-    │   └── Tooltip/
-    ├── hooks/                  # Custom hooks
-    └── utils/                  # UI utilities
-```
-
-### Architecture Benefits
-
-✅ **Testability**: Each layer can be tested in isolation
-✅ **Maintainability**: Localized changes, low coupling
-✅ **Scalability**: Easy to add new components
-✅ **Independence**: Domain doesn't depend on any framework
-
-## 🎨 Design Tokens System
-
-The project uses a complete **CSS design tokens** system to ensure visual consistency.
-
-### File: `src/styles/tokens.css`
-
-```css
-/* Primary colors */
---color-primary-base: #4a90e2;
---color-primary-hover: #357abd;
-
-/* Health statuses */
---color-health-healthy: #4caf50;
---color-health-warning: #ff9800;
---color-health-critical: #f44336;
-
-/* Typography */
---font-size-base: 16px;
---font-size-lg: 20px;
---font-weight-normal: 400;
---font-weight-bold: 700;
-
-/* Spacing */
---spacing-xs: 4px;
---spacing-sm: 8px;
---spacing-md: 16px;
---spacing-lg: 24px;
-
-/* Borders and focus */
---border-radius-md: 8px;
---focus-outline-width: 3px;
---focus-outline-color: var(--color-primary-base);
-
-/* Animations */
---animation-duration-fast: 150ms;
---animation-duration-normal: 200ms;
---animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
-```
-
-### Token Categories
-
-- **Colors**: Primary palette, statuses, neutrals, dark theme
-- **Typography**: Sizes, weights, line heights, letter spacing
-- **Spacing**: Scale from 0 to 40px, component presets
-- **Borders**: Widths, radii, focus styles
-- **Shadows**: Elevations, gaming glow effects
-- **Animations**: Durations, easing functions
-- **Layout**: Z-index, max widths, heights, breakpoints
+**Features:**
+- Automatic gamepad detection
+- D-pad support (buttons 12/13)
+- Left joystick support with configurable deadzone
+- Haptic feedback on selection change
+- Activation with A button (button 0)
 
 ## 💻 Usage
 
@@ -416,34 +165,35 @@ The project uses a complete **CSS design tokens** system to ensure visual consis
 
 ```tsx
 import { useState } from 'react';
-import { GameMenu } from './presentation/components/GameMenu';
-import { DialogBox } from './presentation/components/DialogBox';
-import { useGamepad } from './presentation/hooks/useGamepad';
+import { GameMenu } from 'gaming-ui-a11y-toolkit';
 
 function GameApp() {
-  const [showQuitDialog, setShowQuitDialog] = useState(false);
-  const gamepad = useGamepad();
+  const [gameState, setGameState] = useState<'menu' | 'playing'>('menu');
 
   const menuItems = [
     {
       id: 'start',
       label: 'New Game',
-      onClick: () => console.log('Starting...')
+      icon: '🎮',
+      onSelect: () => setGameState('playing')
     },
     {
       id: 'load',
       label: 'Load Game',
-      onClick: () => console.log('Loading...')
+      icon: '💾',
+      onSelect: () => console.log('Loading...')
     },
     {
       id: 'options',
       label: 'Options',
-      onClick: () => console.log('Options...')
+      icon: '⚙️',
+      onSelect: () => console.log('Options...')
     },
     {
       id: 'quit',
       label: 'Quit',
-      onClick: () => setShowQuitDialog(true)
+      icon: '🚪',
+      onSelect: () => window.close()
     }
   ];
 
@@ -451,31 +201,25 @@ function GameApp() {
     <div className="game-container">
       <h1>My Accessible Game</h1>
 
-      {gamepad.isConnected && (
-        <p>🎮 Gamepad connected</p>
+      {gameState === 'menu' && (
+        <GameMenu
+          title="Main Menu"
+          items={menuItems}
+          enableHapticFeedback={true}
+          onSelectionChange={(index) => {
+            console.log('Navigating to:', menuItems[index].label);
+          }}
+        />
       )}
 
-      <GameMenu
-        items={menuItems}
-        ariaLabel="Main game menu"
-      />
-
-      <DialogBox
-        isOpen={showQuitDialog}
-        onClose={() => setShowQuitDialog(false)}
-        title="Quit Game"
-        content="Are you sure you want to quit?"
-        actions={[
-          {
-            label: 'Yes',
-            onClick: () => window.close()
-          },
-          {
-            label: 'No',
-            onClick: () => setShowQuitDialog(false)
-          }
-        ]}
-      />
+      {gameState === 'playing' && (
+        <div>
+          <h2>Game in progress...</h2>
+          <button onClick={() => setGameState('menu')}>
+            Back to menu
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -483,60 +227,166 @@ function GameApp() {
 export default GameApp;
 ```
 
-### Example: Health System
+### Example: Action Buttons
 
 ```tsx
-import { useState, useEffect } from 'react';
-import { HealthBar } from './presentation/components/HealthBar';
+import { GameButton } from 'gaming-ui-a11y-toolkit';
 
-function PlayerHealth() {
-  const [health, setHealth] = useState(100);
-
-  const takeDamage = (amount: number) => {
-    setHealth(prev => Math.max(0, prev - amount));
-  };
-
-  const heal = (amount: number) => {
-    setHealth(prev => Math.min(100, prev + amount));
-  };
-
+function ActionButtons() {
   return (
-    <div>
-      <HealthBar
-        current={health}
-        max={100}
-        label="Player health"
-        showValue={true}
-        showPercentage={true}
+    <div className="button-group">
+      <GameButton
+        label="Attack"
+        onClick={() => console.log('Attack!')}
+        variant="primary"
+        size="large"
+        enableHapticFeedback={true}
       />
 
-      <button onClick={() => takeDamage(20)}>
-        Take damage (-20)
-      </button>
-      <button onClick={() => heal(30)}>
-        Heal (+30)
-      </button>
+      <GameButton
+        label="Defend"
+        onClick={() => console.log('Defend!')}
+        variant="secondary"
+        size="medium"
+      />
+
+      <GameButton
+        label="Disabled Action"
+        onClick={() => {}}
+        disabled={true}
+      />
     </div>
   );
 }
 ```
 
+### Importing Styles
+
+Don't forget to import the CSS file in your application:
+
+```tsx
+// In your main entry file (e.g., main.tsx or App.tsx)
+import 'gaming-ui-a11y-toolkit/dist/style.css';
+```
+
+## 📚 API Reference
+
+### GameButton Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | **required** | Button text (also used for aria-label) |
+| `onClick` | `() => void` | **required** | Click handler function |
+| `disabled` | `boolean` | `false` | Disables the button |
+| `variant` | `'primary' \| 'secondary'` | `'primary'` | Visual variant of the button |
+| `size` | `'small' \| 'medium' \| 'large'` | `'medium'` | Button size |
+| `className` | `string` | `''` | Additional CSS class names |
+| `enableHapticFeedback` | `boolean` | `true` | Enable haptic feedback on gamepad |
+| `ariaDescribedBy` | `string` | - | ID of element that describes this button |
+
+### GameMenu Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `GameMenuItem[]` | **required** | Array of menu items |
+| `title` | `string` | - | Menu title |
+| `initialSelectedIndex` | `number` | `0` | Initial selected index |
+| `enableHapticFeedback` | `boolean` | `true` | Enable haptic feedback |
+| `onSelectionChange` | `(index: number) => void` | - | Callback when selection changes |
+| `className` | `string` | `''` | Additional CSS class names |
+| `joystickDeadzone` | `number` | `0.5` | Joystick deadzone (0-1) |
+
+### GameMenuItem Type
+
+```typescript
+interface GameMenuItem {
+  id: string;              // Unique identifier
+  label: string;           // Display text
+  onSelect: () => void;    // Action on activation
+  disabled?: boolean;      // Disable the item
+  icon?: string;           // Optional icon
+}
+```
+
+### useGamepadNavigation Options
+
+```typescript
+interface UseGamepadNavigationOptions {
+  itemCount: number;                          // Total number of items
+  initialIndex?: number;                      // Initial index (default: 0)
+  onSelectionChange?: (index: number) => void; // Selection change callback
+  onActivate?: (index: number) => void;        // Activation callback
+  enableHapticFeedback?: boolean;              // Haptic feedback (default: true)
+  joystickDeadzone?: number;                   // Deadzone (default: 0.5)
+}
+```
+
+### useGamepadNavigation Return Value
+
+```typescript
+interface UseGamepadNavigationReturn {
+  selectedIndex: number;           // Currently selected index
+  isGamepadConnected: boolean;     // Gamepad connection status
+  setSelectedIndex: (index: number) => void; // Manually set index
+}
+```
+
 ## 🛠️ Development
 
-### Available Scripts
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, or pnpm
+
+### Local Installation
 
 ```bash
-# Development with hot reload
+# Clone the repository
+git clone https://github.com/thomaslebeau/gaming_ui_a11y_toolkit.git
+cd gaming_ui_a11y_toolkit
+
+# Install dependencies
+npm install
+
+# Run in development mode
 npm run dev
 
-# Production build
+# Build for production
 npm run build
 
-# Build preview
-npm run preview
+# Run tests
+npm test
 
-# Linting
+# Lint code
 npm run lint
+```
+
+### Project Structure
+
+```
+gaming_ui_a11y_toolkit/
+├── src/
+│   ├── components/
+│   │   ├── GameButton/
+│   │   │   ├── GameButton.tsx
+│   │   │   └── index.ts
+│   │   └── GameMenu/
+│   │       ├── GameMenu.tsx
+│   │       └── index.ts
+│   ├── hooks/
+│   │   ├── useGamepadNavigation.ts
+│   │   └── index.ts
+│   ├── types/
+│   │   ├── button.types.ts
+│   │   ├── menu.types.ts
+│   │   └── Gamepad.type.ts
+│   ├── styles/
+│   │   └── components/
+│   └── index.ts
+├── dist/
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
 ```
 
 ### Tech Stack
@@ -544,20 +394,9 @@ npm run lint
 - **React 19.2** - UI library with React Compiler
 - **TypeScript 5.9** - Strict static typing
 - **Vite (rolldown)** - Ultra-fast build tool
-- **CSS Custom Properties** - Design tokens system
+- **CSS Modules** - Scoped component styles
 - **Gamepad API** - Native gamepad support
 - **ARIA** - Semantic accessibility
-
-### Tests
-
-Components include test files:
-- `HealthBar.test.tsx` - Health bar unit tests
-- `Tooltip.test.tsx` - Tooltip unit tests
-
-```bash
-# Run tests (to be configured)
-npm test
-```
 
 ## 🤝 Contributing
 
@@ -569,23 +408,51 @@ Contributions are welcome! Here's how to participate:
 4. **Push** to the branch (`git push origin feature/AmazingFeature`)
 5. **Open** a Pull Request
 
-### Guidelines
+### Contribution Guidelines
 
-- Respect the Clean Architecture pattern
+- Follow the project's TypeScript conventions
 - Write tests for new features
 - Document components with JSDoc
-- Follow the project's TypeScript conventions
-- Ensure accessibility (WCAG 2.1 Level AA minimum)
+- Ensure accessibility (WCAG 2.1 AA minimum)
 - Test with BOTH keyboard AND gamepad
+- Follow Clean Code principles
 
-## 📝 License
+## 🐛 Reporting Bugs
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+If you find a bug, please [open an issue](https://github.com/thomaslebeau/gaming_ui_a11y_toolkit/issues) with:
 
----
+- Clear description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- Your environment (browser, OS, version)
+
+## 🗺️ Roadmap
+
+Features planned for future releases:
+
+- [ ] HealthBar - Health bar with colored zones
+- [ ] InventoryGrid - Navigable 2D inventory grid
+- [ ] DialogBox - Modal dialog with focus trap
+- [ ] Tooltip - Accessible contextual tooltips
+- [ ] useDialogFocus - Hook for modal focus management
+- [ ] useInventoryGrid - Hook for 2D navigation
+- [ ] Customizable theme support
+- [ ] More accessible gaming components
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
 This project was developed with the goal of making web games more accessible to all players, regardless of their abilities. Thanks to the accessibility community and game developers for their inspiration.
+
+## 📞 Contact
+
+Thomas Lebeau - [@thomaslebeau](https://github.com/thomaslebeau)
+
+Project Link: [https://github.com/thomaslebeau/gaming_ui_a11y_toolkit](https://github.com/thomaslebeau/gaming_ui_a11y_toolkit)
+
+---
 
 **Made with ❤️ for inclusion and accessibility in gaming**
