@@ -7,6 +7,9 @@
  * @packageDocumentation
  */
 
+// Import styles
+import './styles/index.css';
+
 // Components
 export { GameButton } from './components/GameButton';
 export { GameMenu } from './components/GameMenu';

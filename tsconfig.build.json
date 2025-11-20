@@ -7,9 +7,10 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "moduleDetection": "force",
     "jsx": "react-jsx",
+    "allowImportingTsExtensions": false,
 
     /* Emit */
     "outDir": "./dist",
@@ -24,7 +25,7 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src/**/*"],
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.test.tsx",

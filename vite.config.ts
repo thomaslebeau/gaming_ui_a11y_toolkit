@@ -8,9 +8,10 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
-      include: ['src'],
-      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/App.tsx', 'src/main.tsx'],
-      rollupTypes: false,
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/App.tsx', 'src/main.tsx', 'src/vite-env.d.ts'],
+      outDir: 'dist',
+      tsconfigPath: './tsconfig.build.json',
     }),
   ],
   build: {
