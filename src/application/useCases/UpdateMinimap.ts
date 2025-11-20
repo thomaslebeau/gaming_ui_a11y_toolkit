@@ -1,5 +1,5 @@
 import { MinimapState } from '../../domain/entities/MinimapState';
-import { POI, Position } from '../../domain/entities/POI';
+import { POI, type Position } from '../../domain/entities/POI';
 
 /**
  * UpdateMinimap use case handles minimap state updates and interactions.

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MinimapState } from '../../domain/entities/MinimapState';
-import { POI, Position } from '../../domain/entities/POI';
+import { POI, type Position } from '../../domain/entities/POI';
 import { UpdateMinimap } from '../../application/useCases/UpdateMinimap';
 import { BrowserMinimapAdapter } from '../../infrastructure/adapters/BrowserMinimapAdapter';
 import { BrowserGamepadAdapter } from '../../infrastructure/adapters/BrowserGamepadAdapter';

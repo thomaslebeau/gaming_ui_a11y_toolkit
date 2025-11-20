@@ -1,4 +1,4 @@
-import { POI, Position } from './POI';
+import { POI, type Position } from './POI';
 
 /**
  * MinimapState entity represents the state and configuration of a minimap.

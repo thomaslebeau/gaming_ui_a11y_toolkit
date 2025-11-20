@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { POI, Position } from '../../../domain/entities/POI';
-import { useMinimap } from '../../hooks/useMinimap';
-import styles from './Minimap.module.css';
+import { useEffect, useRef } from "react";
+import { POI, type Position } from "../../../domain/entities/POI";
+import { useMinimap } from "../../hooks/useMinimap";
+import styles from "./Minimap.module.css";
 
 export interface MinimapProps {
   /** Width of the minimap in rem */
@@ -15,7 +15,7 @@ export interface MinimapProps {
   /** Array of points of interest to display on the map */
   pointsOfInterest: Array<{
     id: string;
-    type: 'enemy' | 'objective' | 'waypoint' | 'ally';
+    type: "enemy" | "objective" | "waypoint" | "ally";
     position: Position;
     label: string;
   }>;
@@ -64,7 +64,7 @@ export const Minimap = ({
   zoom = 1.0,
   rotateWithPlayer = false,
   onPOIClick,
-  ariaLabel = 'Game minimap',
+  ariaLabel = "Game minimap",
   enableAudioPings = true,
 }: MinimapProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -100,7 +100,7 @@ export const Minimap = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Convert rem to pixels (assuming 16px base font size)
@@ -126,14 +126,14 @@ export const Minimap = ({
     // Background circle
     ctx.beginPath();
     ctx.arc(centerX, centerY, mapRadius, 0, 2 * Math.PI);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fill();
-    ctx.strokeStyle = '#00d9ff';
+    ctx.strokeStyle = "#00d9ff";
     ctx.lineWidth = 2;
     ctx.stroke();
 
     // Grid lines for reference
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
     ctx.lineWidth = 1;
 
     // Vertical and horizontal lines
@@ -153,12 +153,12 @@ export const Minimap = ({
 
       // POI color based on type
       const colors: Record<string, string> = {
-        enemy: '#ff4444',
-        objective: '#ffaa00',
-        waypoint: '#00aaff',
-        ally: '#44ff44',
+        enemy: "#ff4444",
+        objective: "#ffaa00",
+        waypoint: "#00aaff",
+        ally: "#44ff44",
       };
-      const color = colors[poi.type] || '#ffffff';
+      const color = colors[poi.type] || "#ffffff";
 
       // Draw POI marker
       ctx.beginPath();
@@ -168,24 +168,24 @@ export const Minimap = ({
 
       // Draw border for focused POI
       if (isFocused) {
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.stroke();
       }
 
       // Draw icon based on type
-      ctx.fillStyle = '#000';
-      ctx.font = isFocused ? '10px Arial' : '8px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.fillStyle = "#000";
+      ctx.font = isFocused ? "10px Arial" : "8px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
       const icons: Record<string, string> = {
-        enemy: '×',
-        objective: '!',
-        waypoint: '▸',
-        ally: '+',
+        enemy: "×",
+        objective: "!",
+        waypoint: "▸",
+        ally: "+",
       };
-      const icon = icons[poi.type] || '•';
+      const icon = icons[poi.type] || "•";
       ctx.fillText(icon, screenPos.x, screenPos.y);
     });
 
@@ -204,9 +204,9 @@ export const Minimap = ({
     ctx.lineTo(-6, 6);
     ctx.lineTo(6, 6);
     ctx.closePath();
-    ctx.fillStyle = '#00d9ff';
+    ctx.fillStyle = "#00d9ff";
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
     ctx.stroke();
 

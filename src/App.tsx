@@ -177,14 +177,16 @@ function App() {
       <div style={{ textAlign: "center" }}>
         <h1>Gaming A11y Toolkit</h1>
         <p>
-          Try with gamepad (D-pad, A/B buttons) or keyboard (Arrow keys, Enter/Space/Escape)
+          Try with gamepad (D-pad, A/B buttons) or keyboard (Arrow keys,
+          Enter/Space/Escape)
         </p>
       </div>
 
       <div style={{ textAlign: "center" }}>
         <h2>InventoryGrid Demo</h2>
         <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
-          Navigate with arrows/D-pad. Press Enter/A to move items. Navigate to destination and press Enter/A again to place.
+          Navigate with arrows/D-pad. Press Enter/A to move items. Navigate to
+          destination and press Enter/A again to place.
         </p>
         <InventoryGrid
           columns={4}
@@ -224,11 +226,13 @@ function App() {
       <div style={{ textAlign: "center", marginBottom: "10rem" }}>
         <h2>Minimap Demo</h2>
         <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
-          Press <strong>M</strong> to toggle minimap. Use <strong>+/-</strong> to zoom, <strong>Tab</strong> to navigate POIs, <strong>Enter</strong> to select.
+          Press <strong>M</strong> to toggle minimap. Use <strong>+/-</strong>{" "}
+          to zoom, <strong>Tab</strong> to navigate POIs, <strong>Enter</strong>{" "}
+          to select.
           <br />
           Player moves in a circle to demonstrate nearby POI detection.
         </p>
-        <div style={{ position: "relative", height: "15rem" }}>
+        {/* <div style={{ position: "relative", height: "15rem" }}>
           <Minimap
             width={15}
             height={15}
@@ -241,7 +245,7 @@ function App() {
             ariaLabel="Game minimap showing nearby enemies and objectives"
             enableAudioPings={true}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
