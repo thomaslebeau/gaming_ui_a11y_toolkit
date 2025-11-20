@@ -2,6 +2,7 @@
 
 export class GamepadState {
   readonly connected: boolean;
+  readonly id: string;                  // Nom/ID de la manette
   readonly buttonPressed: boolean;      // Vrai SEULEMENT pour A, B, X, Y, Gâchettes... (Pas le D-Pad)
   readonly buttonIndex: number | null;  // Index du bouton pressé
   readonly axes: readonly number[];     // État brut des sticks
@@ -9,12 +10,14 @@ export class GamepadState {
 
   constructor(
     connected: boolean,
+    id: string,
     buttonPressed: boolean,
     buttonIndex: number | null,
     axes: readonly number[],
     buttons: readonly GamepadButton[]
   ) {
     this.connected = connected;
+    this.id = id;
     this.buttonPressed = buttonPressed;
     this.buttonIndex = buttonIndex;
     this.axes = axes;
@@ -25,12 +28,12 @@ export class GamepadState {
 
   // Créer un état déconnecté par défaut
   static createDisconnected(): GamepadState {
-    return new GamepadState(false, false, null, [], []);
+    return new GamepadState(false, '', false, null, [], []);
   }
 
   // Créer un état connecté vide
   static createConnected(): GamepadState {
-    return new GamepadState(true, false, null, [], []);
+    return new GamepadState(true, '', false, null, [], []);
   }
 
   /**
@@ -41,13 +44,13 @@ export class GamepadState {
     // On copie les tableaux pour figer l'état (Snapshot) et éviter les mutations par référence
     const buttons = Array.from(gamepad.buttons);
     const axes = Array.from(gamepad.axes);
-    
+
     // Fonction helper : Un bouton est une "Action" s'il est pressé ET qu'il n'est pas sur le D-Pad
     // Standard Mapping : 12=Haut, 13=Bas, 14=Gauche, 15=Droite
     const isActionPress = (b: GamepadButton, index: number) => {
       const isDPad = index >= 12 && index <= 15;
       console.log('is action press =>', index);
-      return b.pressed && !isDPad; 
+      return b.pressed && !isDPad;
     };
 
     // On détermine si un bouton d'action est actif
@@ -58,6 +61,7 @@ export class GamepadState {
 
     return new GamepadState(
       gamepad.connected,
+      gamepad.id,
       buttonPressed, // Sera FALSE si on appuie uniquement sur la croix directionnelle
       buttonIndex > -1 ? buttonIndex : null,
       axes,
@@ -112,11 +116,11 @@ export class GamepadState {
     if (!this.connected) {
       throw new Error('Cannot press button on disconnected gamepad');
     }
-    return new GamepadState(true, true, buttonIndex, this.axes, this.buttons);
+    return new GamepadState(true, this.id, true, buttonIndex, this.axes, this.buttons);
   }
 
   withButtonRelease(): GamepadState {
-    return new GamepadState(this.connected, false, null, this.axes, this.buttons);
+    return new GamepadState(this.connected, this.id, false, null, this.axes, this.buttons);
   }
 
   disconnect(): GamepadState {
