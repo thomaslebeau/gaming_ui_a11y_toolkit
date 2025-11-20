@@ -171,6 +171,28 @@ export const useInventoryGrid = ({
   // Gamepad navigation - utilise le Context centralisé
   const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  // Use refs to capture latest handlers without triggering re-subscription
+  const handlersRef = useRef({
+    handleNavigateUp,
+    handleNavigateDown,
+    handleNavigateLeft,
+    handleNavigateRight,
+    handleSelect,
+    handleCancelMove,
+  });
+
+  // Update ref on every render
+  useEffect(() => {
+    handlersRef.current = {
+      handleNavigateUp,
+      handleNavigateDown,
+      handleNavigateLeft,
+      handleNavigateRight,
+      handleSelect,
+      handleCancelMove,
+    };
+  });
+
   useEffect(() => {
     let lastButtonState = {
       up: false,
@@ -186,7 +208,7 @@ export const useInventoryGrid = ({
       // D-pad Up (button 12)
       if (gamepadState.buttonIndex === 12 && !lastButtonState.up) {
         lastButtonState.up = true;
-        handleNavigateUp();
+        handlersRef.current.handleNavigateUp();
       } else if (gamepadState.buttonIndex !== 12) {
         lastButtonState.up = false;
       }
@@ -194,7 +216,7 @@ export const useInventoryGrid = ({
       // D-pad Down (button 13)
       if (gamepadState.buttonIndex === 13 && !lastButtonState.down) {
         lastButtonState.down = true;
-        handleNavigateDown();
+        handlersRef.current.handleNavigateDown();
       } else if (gamepadState.buttonIndex !== 13) {
         lastButtonState.down = false;
       }
@@ -202,7 +224,7 @@ export const useInventoryGrid = ({
       // D-pad Left (button 14)
       if (gamepadState.buttonIndex === 14 && !lastButtonState.left) {
         lastButtonState.left = true;
-        handleNavigateLeft();
+        handlersRef.current.handleNavigateLeft();
       } else if (gamepadState.buttonIndex !== 14) {
         lastButtonState.left = false;
       }
@@ -210,7 +232,7 @@ export const useInventoryGrid = ({
       // D-pad Right (button 15)
       if (gamepadState.buttonIndex === 15 && !lastButtonState.right) {
         lastButtonState.right = true;
-        handleNavigateRight();
+        handlersRef.current.handleNavigateRight();
       } else if (gamepadState.buttonIndex !== 15) {
         lastButtonState.right = false;
       }
@@ -218,7 +240,7 @@ export const useInventoryGrid = ({
       // A button (button 0) - Select/Move
       if (gamepadState.buttonIndex === 0 && !lastButtonState.a) {
         lastButtonState.a = true;
-        handleSelect();
+        handlersRef.current.handleSelect();
       } else if (gamepadState.buttonIndex !== 0) {
         lastButtonState.a = false;
       }
@@ -226,22 +248,14 @@ export const useInventoryGrid = ({
       // B button (button 1) - Cancel move
       if (gamepadState.buttonIndex === 1 && !lastButtonState.b) {
         lastButtonState.b = true;
-        handleCancelMove();
+        handlersRef.current.handleCancelMove();
       } else if (gamepadState.buttonIndex !== 1) {
         lastButtonState.b = false;
       }
     });
 
     return unsubscribe;
-  }, [
-    subscribeToButtonPress,
-    handleNavigateUp,
-    handleNavigateDown,
-    handleNavigateLeft,
-    handleNavigateRight,
-    handleSelect,
-    handleCancelMove,
-  ]);
+  }, [subscribeToButtonPress]); // Only re-subscribe if subscribeToButtonPress changes
 
   // Cleanup inventory adapter on unmount (gamepad adapter est géré par le Context)
   useEffect(() => {

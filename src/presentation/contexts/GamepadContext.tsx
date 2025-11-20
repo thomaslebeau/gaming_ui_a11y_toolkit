@@ -59,13 +59,11 @@ export const GamepadProvider: React.FC<GamepadProviderProps> = ({ children }) =>
     const cleanup = detectGamepad.execute(
       // onConnected
       (state) => {
-        console.log('GamepadContext: gamepad connected');
         setGamepadState(state);
         setIsConnected(true);
       },
       // onDisconnected
       () => {
-        console.log('GamepadContext: gamepad disconnected');
         setGamepadState(GamepadState.createDisconnected());
         setIsConnected(false);
       },

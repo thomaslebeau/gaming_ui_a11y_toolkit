@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGamepadContext } from '../contexts/GamepadContext';
 
 /**
@@ -8,16 +8,24 @@ import { useGamepadContext } from '../contexts/GamepadContext';
 export const useGamepad = (onButtonPress?: () => void) => {
   const { gamepadState, onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  // Use ref to capture latest callback without triggering re-subscription
+  const callbackRef = useRef(onButtonPress);
+
+  // Update ref on every render
   useEffect(() => {
-    if (!onButtonPress) return;
+    callbackRef.current = onButtonPress;
+  });
+
+  useEffect(() => {
+    if (!callbackRef.current) return;
 
     // S'abonne aux événements de pression de bouton via le Context centralisé
     const unsubscribe = subscribeToButtonPress(() => {
-      onButtonPress();
+      callbackRef.current?.();
     });
 
     return unsubscribe;
-  }, [subscribeToButtonPress, onButtonPress]);
+  }, [subscribeToButtonPress]); // Only re-subscribe if subscribeToButtonPress changes
 
   return gamepadState;
 };

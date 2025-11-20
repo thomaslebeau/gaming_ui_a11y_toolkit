@@ -242,6 +242,32 @@ export const useMinimap = ({
   // Gamepad navigation - utilise le Context centralisé
   const { onButtonPress: subscribeToButtonPress } = useGamepadContext();
 
+  // Use refs to capture latest values without triggering re-subscription
+  const handlersRef = useRef({
+    handleToggleVisibility,
+    handleFocusNextPOI,
+    handleFocusPreviousPOI,
+    handleFocusedPOIClick,
+  });
+  const stateRef = useRef({
+    isVisible: minimapState.isVisible,
+    focusedPOIId: minimapState.focusedPOIId,
+  });
+
+  // Update refs on every render
+  useEffect(() => {
+    handlersRef.current = {
+      handleToggleVisibility,
+      handleFocusNextPOI,
+      handleFocusPreviousPOI,
+      handleFocusedPOIClick,
+    };
+    stateRef.current = {
+      isVisible: minimapState.isVisible,
+      focusedPOIId: minimapState.focusedPOIId,
+    };
+  });
+
   useEffect(() => {
     let lastButtonState = {
       select: false,
@@ -255,7 +281,7 @@ export const useMinimap = ({
       // Select button (button 8) - Toggle visibility
       if (gamepadState.buttonIndex === 8 && !lastButtonState.select) {
         lastButtonState.select = true;
-        handleToggleVisibility();
+        handlersRef.current.handleToggleVisibility();
       } else if (gamepadState.buttonIndex !== 8) {
         lastButtonState.select = false;
       }
@@ -264,10 +290,10 @@ export const useMinimap = ({
       if (
         gamepadState.buttonIndex === 12 &&
         !lastButtonState.up &&
-        minimapState.isVisible
+        stateRef.current.isVisible
       ) {
         lastButtonState.up = true;
-        handleFocusPreviousPOI();
+        handlersRef.current.handleFocusPreviousPOI();
       } else if (gamepadState.buttonIndex !== 12) {
         lastButtonState.up = false;
       }
@@ -276,10 +302,10 @@ export const useMinimap = ({
       if (
         gamepadState.buttonIndex === 13 &&
         !lastButtonState.down &&
-        minimapState.isVisible
+        stateRef.current.isVisible
       ) {
         lastButtonState.down = true;
-        handleFocusNextPOI();
+        handlersRef.current.handleFocusNextPOI();
       } else if (gamepadState.buttonIndex !== 13) {
         lastButtonState.down = false;
       }
@@ -288,26 +314,18 @@ export const useMinimap = ({
       if (
         gamepadState.buttonIndex === 0 &&
         !lastButtonState.a &&
-        minimapState.isVisible &&
-        minimapState.focusedPOIId
+        stateRef.current.isVisible &&
+        stateRef.current.focusedPOIId
       ) {
         lastButtonState.a = true;
-        handleFocusedPOIClick();
+        handlersRef.current.handleFocusedPOIClick();
       } else if (gamepadState.buttonIndex !== 0) {
         lastButtonState.a = false;
       }
     });
 
     return unsubscribe;
-  }, [
-    subscribeToButtonPress,
-    handleToggleVisibility,
-    handleFocusNextPOI,
-    handleFocusPreviousPOI,
-    handleFocusedPOIClick,
-    minimapState.isVisible,
-    minimapState.focusedPOIId,
-  ]);
+  }, [subscribeToButtonPress]); // Only re-subscribe if subscribeToButtonPress changes
 
   // Cleanup minimap adapter on unmount (gamepad adapter est géré par le Context)
   useEffect(() => {
