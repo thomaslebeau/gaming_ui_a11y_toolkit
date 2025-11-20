@@ -55,13 +55,19 @@ export const useMinimap = ({
 
   const updateUseCase = new UpdateMinimap();
   const adapterRef = useRef<BrowserMinimapAdapter | null>(null);
+  const gamepadAdapterRef = useRef<BrowserGamepadAdapter | null>(null);
 
-  // Initialize adapter
+  // Initialize adapters
   if (!adapterRef.current) {
     adapterRef.current = new BrowserMinimapAdapter();
   }
 
+  if (!gamepadAdapterRef.current) {
+    gamepadAdapterRef.current = new BrowserGamepadAdapter();
+  }
+
   const adapter = adapterRef.current;
+  const gamepadAdapter = gamepadAdapterRef.current;
 
   // Update player position when it changes
   useEffect(() => {
@@ -238,7 +244,6 @@ export const useMinimap = ({
 
   // Gamepad navigation
   useEffect(() => {
-    const gamepadAdapter = new BrowserGamepadAdapter();
     const gamepadUseCase = new DetectGamepadConnection(gamepadAdapter);
 
     let lastButtonState = {
@@ -301,6 +306,7 @@ export const useMinimap = ({
 
     return cleanup;
   }, [
+    gamepadAdapter,
     handleToggleVisibility,
     handleFocusNextPOI,
     handleFocusPreviousPOI,
@@ -309,12 +315,13 @@ export const useMinimap = ({
     minimapState.focusedPOIId,
   ]);
 
-  // Cleanup adapter on unmount
+  // Cleanup adapters on unmount
   useEffect(() => {
     return () => {
       adapter.cleanup();
+      gamepadAdapter.cleanup();
     };
-  }, [adapter]);
+  }, [adapter, gamepadAdapter]);
 
   return {
     isVisible: minimapState.isVisible,

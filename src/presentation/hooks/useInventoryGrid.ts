@@ -38,13 +38,19 @@ export const useInventoryGrid = ({
 
   const navigateUseCase = new NavigateInventoryGrid();
   const adapterRef = useRef<BrowserInventoryAdapter | null>(null);
+  const gamepadAdapterRef = useRef<BrowserGamepadAdapter | null>(null);
 
-  // Initialize adapter
+  // Initialize adapters
   if (!adapterRef.current) {
     adapterRef.current = new BrowserInventoryAdapter();
   }
 
+  if (!gamepadAdapterRef.current) {
+    gamepadAdapterRef.current = new BrowserGamepadAdapter();
+  }
+
   const adapter = adapterRef.current;
+  const gamepadAdapter = gamepadAdapterRef.current;
 
   // Update items when they change
   useEffect(() => {
@@ -175,7 +181,6 @@ export const useInventoryGrid = ({
 
   // Gamepad navigation
   useEffect(() => {
-    const gamepadAdapter = new BrowserGamepadAdapter();
     const gamepadUseCase = new DetectGamepadConnection(gamepadAdapter);
 
     let lastButtonState = {
@@ -243,6 +248,7 @@ export const useInventoryGrid = ({
 
     return cleanup;
   }, [
+    gamepadAdapter,
     handleNavigateUp,
     handleNavigateDown,
     handleNavigateLeft,
@@ -251,12 +257,13 @@ export const useInventoryGrid = ({
     handleCancelMove,
   ]);
 
-  // Cleanup adapter on unmount
+  // Cleanup adapters on unmount
   useEffect(() => {
     return () => {
       adapter.cleanup();
+      gamepadAdapter.cleanup();
     };
-  }, [adapter]);
+  }, [adapter, gamepadAdapter]);
 
   return {
     focusedIndex: inventoryState.focusedIndex,
