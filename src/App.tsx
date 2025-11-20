@@ -4,6 +4,7 @@ import { GameMenu } from "./presentation/components/GameMenu";
 import { InventoryGrid } from "./presentation/components/InventoryGrid";
 import { Minimap } from "./presentation/components/Minimap";
 import type { InventoryItem } from "./domain/entities/InventoryState";
+import { GamepadProvider } from "./presentation/contexts/GamepadContext";
 
 function App() {
   const handleClick = () => {
@@ -163,104 +164,106 @@ function App() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        gap: "3rem",
-        flexDirection: "column",
-        padding: "2rem",
-      }}
-    >
-      <div style={{ textAlign: "center" }}>
-        <h1>Gaming A11y Toolkit</h1>
-        <p>
-          Try with gamepad (D-pad, A/B buttons) or keyboard (Arrow keys,
-          Enter/Space/Escape)
-        </p>
-      </div>
+    <GamepadProvider>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          gap: "3rem",
+          flexDirection: "column",
+          padding: "2rem",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <h1>Gaming A11y Toolkit</h1>
+          <p>
+            Try with gamepad (D-pad, A/B buttons) or keyboard (Arrow keys,
+            Enter/Space/Escape)
+          </p>
+        </div>
 
-      <GameButton onClick={handleClick} ariaLabel="Action button">
-        Press Me
-      </GameButton>
-      <GameButton onClick={handleClick} ariaLabel="Action button 2">
-        Press Me 2
-      </GameButton>
+        <GameButton onClick={handleClick} ariaLabel="Action button">
+          Press Me
+        </GameButton>
+        <GameButton onClick={handleClick} ariaLabel="Action button 2">
+          Press Me 2
+        </GameButton>
 
-      <GameMenu
-        items={menuItems}
-        defaultFocusIndex={0}
-        ariaLabel="Main game menu"
-      />
-
-      {/* <div style={{ textAlign: "center" }}>
-        <h2>InventoryGrid Demo</h2>
-        <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
-          Navigate with arrows/D-pad. Press Enter/A to move items. Navigate to
-          destination and press Enter/A again to place.
-        </p>
-        <InventoryGrid
-          columns={4}
-          rows={6}
-          items={inventoryItems}
-          onItemSelect={handleItemSelect}
-          onItemMove={handleItemMove}
-          wrapNavigation={true}
-          ariaLabel="Player inventory"
-        />
-      </div>
-
-      <div style={{ textAlign: "center" }}>
-        <h2>GameMenu Demo</h2>
         <GameMenu
           items={menuItems}
           defaultFocusIndex={0}
           ariaLabel="Main game menu"
         />
-      </div>
 
-      <div style={{ textAlign: "center" }}>
-        <h2>GameButton Demo</h2>
-        <div style={{ display: "flex", gap: "1rem", flexDirection: "column" }}>
-          <GameButton onClick={handleClick} ariaLabel="Action button">
-            Press Me
-          </GameButton>
-
-          <GameButton onClick={handleClick}>Another Button</GameButton>
-
-          <GameButton onClick={handleClick} disabled>
-            Disabled Button
-          </GameButton>
-        </div>
-      </div>
-
-      <div style={{ textAlign: "center", marginBottom: "10rem" }}>
-        <h2>Minimap Demo</h2>
-        <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
-          Press <strong>M</strong> to toggle minimap. Use <strong>+/-</strong>{" "}
-          to zoom, <strong>Tab</strong> to navigate POIs, <strong>Enter</strong>{" "}
-          to select.
-          <br />
-          Player moves in a circle to demonstrate nearby POI detection.
-        </p>
-        <div style={{ position: "relative", height: "15rem" }}>
-          <Minimap
-            width={15}
-            height={15}
-            playerPosition={playerPosition}
-            playerRotation={playerRotation}
-            pointsOfInterest={pointsOfInterest}
-            zoom={1.0}
-            rotateWithPlayer={true}
-            onPOIClick={handlePOIClick}
-            ariaLabel="Game minimap showing nearby enemies and objectives"
-            enableAudioPings={true}
+        {/* <div style={{ textAlign: "center" }}>
+          <h2>InventoryGrid Demo</h2>
+          <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
+            Navigate with arrows/D-pad. Press Enter/A to move items. Navigate to
+            destination and press Enter/A again to place.
+          </p>
+          <InventoryGrid
+            columns={4}
+            rows={6}
+            items={inventoryItems}
+            onItemSelect={handleItemSelect}
+            onItemMove={handleItemMove}
+            wrapNavigation={true}
+            ariaLabel="Player inventory"
           />
         </div>
-      </div> */}
-    </div>
+
+        <div style={{ textAlign: "center" }}>
+          <h2>GameMenu Demo</h2>
+          <GameMenu
+            items={menuItems}
+            defaultFocusIndex={0}
+            ariaLabel="Main game menu"
+          />
+        </div>
+
+        <div style={{ textAlign: "center" }}>
+          <h2>GameButton Demo</h2>
+          <div style={{ display: "flex", gap: "1rem", flexDirection: "column" }}>
+            <GameButton onClick={handleClick} ariaLabel="Action button">
+              Press Me
+            </GameButton>
+
+            <GameButton onClick={handleClick}>Another Button</GameButton>
+
+            <GameButton onClick={handleClick} disabled>
+              Disabled Button
+            </GameButton>
+          </div>
+        </div>
+
+        <div style={{ textAlign: "center", marginBottom: "10rem" }}>
+          <h2>Minimap Demo</h2>
+          <p style={{ maxWidth: "40rem", margin: "0 auto 1rem" }}>
+            Press <strong>M</strong> to toggle minimap. Use <strong>+/-</strong>{" "}
+            to zoom, <strong>Tab</strong> to navigate POIs, <strong>Enter</strong>{" "}
+            to select.
+            <br />
+            Player moves in a circle to demonstrate nearby POI detection.
+          </p>
+          <div style={{ position: "relative", height: "15rem" }}>
+            <Minimap
+              width={15}
+              height={15}
+              playerPosition={playerPosition}
+              playerRotation={playerRotation}
+              pointsOfInterest={pointsOfInterest}
+              zoom={1.0}
+              rotateWithPlayer={true}
+              onPOIClick={handlePOIClick}
+              ariaLabel="Game minimap showing nearby enemies and objectives"
+              enableAudioPings={true}
+            />
+          </div>
+        </div> */}
+      </div>
+    </GamepadProvider>
   );
 }
 

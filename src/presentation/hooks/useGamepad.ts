@@ -1,36 +1,30 @@
-import { useEffect, useState } from 'react';
-import { GamepadState } from '../../domain/entities/GamepadState';
+import { useEffect } from 'react';
+import { useGamepadContext } from '../contexts/GamepadContext';
 import { DetectGamepadConnection } from '../../application/useCases/DetectGamepadConnection';
-import { BrowserGamepadAdapter } from '../../infrastructure/adapters/BrowserGamepadAdapter';
 
+/**
+ * Hook simplifié qui retourne l'état du gamepad depuis le Context centralisé
+ * et gère les callbacks de pression de bouton si fournis
+ */
 export const useGamepad = (onButtonPress?: () => void) => {
-  const [gamepadState, setGamepadState] = useState<GamepadState>(
-    GamepadState.createDisconnected()
-  );
+  const { adapter, gamepadState } = useGamepadContext();
 
   useEffect(() => {
-    // Create instances inside useEffect to ensure single creation
-    const adapter = new BrowserGamepadAdapter();
+    if (!onButtonPress) return;
+
+    // Si onButtonPress est fourni, on crée juste le use case pour gérer le callback
+    // L'adapter et l'état sont déjà gérés par le Context
     const useCase = new DetectGamepadConnection(adapter);
 
-    // Execute use case with callbacks
+    // On n'a besoin que du callback de bouton, l'état est déjà géré par le Context
     const cleanup = useCase.execute(
-      // On connected
-      (state) => setGamepadState(state),
-      
-      // On disconnected
-      () => setGamepadState(GamepadState.createDisconnected()),
-      
-      // On button press
-      (state) => {
-        setGamepadState(state);
-        onButtonPress?.();
-      }
+      () => {}, // onConnected - ignoré car géré par le Context
+      () => {}, // onDisconnected - ignoré car géré par le Context
+      () => onButtonPress() // onButtonPress - c'est ce qui nous intéresse
     );
 
-    // Cleanup on unmount
     return cleanup;
-  }, []); // Empty deps if onButtonPress doesn't need to be reactive
+  }, [adapter, onButtonPress]);
 
   return gamepadState;
 };
