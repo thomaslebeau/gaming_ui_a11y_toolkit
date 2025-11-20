@@ -5,27 +5,37 @@ import type { IGamepadRepository } from '../../domain/ports/IGamepadRepository';
 export class BrowserGamepadAdapter implements IGamepadRepository {
   private currentState: GamepadState = GamepadState.createDisconnected();
   private animationFrameId: number | null = null;
+  private connectHandler: ((e: GamepadEvent) => void) | null = null;
+  private disconnectHandler: (() => void) | null = null;
 
   onConnect(callback: (state: GamepadState) => void): void {
-    
-    const handleConnect = (e: GamepadEvent) => {
+    // Remove previous handler if exists
+    if (this.connectHandler) {
+      window.removeEventListener('gamepadconnected', this.connectHandler);
+    }
+
+    this.connectHandler = (e: GamepadEvent) => {
       console.log('🎮 Adapter: gamepad connected -', e.gamepad.id);
       this.currentState = GamepadState.createConnected();
       callback(this.currentState);
     };
 
-    window.addEventListener('gamepadconnected', handleConnect);
+    window.addEventListener('gamepadconnected', this.connectHandler);
   }
 
   onDisconnect(callback: () => void): void {
-    
-    const handleDisconnect = () => {
+    // Remove previous handler if exists
+    if (this.disconnectHandler) {
+      window.removeEventListener('gamepaddisconnected', this.disconnectHandler);
+    }
+
+    this.disconnectHandler = () => {
       console.log('🎮 Adapter: gamepad disconnected');
       this.currentState = GamepadState.createDisconnected();
       callback();
     };
 
-    window.addEventListener('gamepaddisconnected', handleDisconnect);
+    window.addEventListener('gamepaddisconnected', this.disconnectHandler);
   }
 
   pollButtons(callback: (state: GamepadState) => void): void {
@@ -60,8 +70,17 @@ export class BrowserGamepadAdapter implements IGamepadRepository {
       this.animationFrameId = null;
     }
 
-    // Note: We can't remove event listeners here without keeping references
-    // In a real app, you'd store the handlers and remove them properly
+    // Remove event listeners to prevent memory leaks
+    if (this.connectHandler) {
+      window.removeEventListener('gamepadconnected', this.connectHandler);
+      this.connectHandler = null;
+    }
+
+    if (this.disconnectHandler) {
+      window.removeEventListener('gamepaddisconnected', this.disconnectHandler);
+      this.disconnectHandler = null;
+    }
+
     console.log('🎮 Adapter: cleanup');
   }
 }

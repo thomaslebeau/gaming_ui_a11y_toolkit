@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { MinimapState } from '../../domain/entities/MinimapState';
 import { POI, type Position } from '../../domain/entities/POI';
 import { UpdateMinimap } from '../../application/useCases/UpdateMinimap';
@@ -53,40 +53,35 @@ export const useMinimap = ({
     )
   );
 
-  const updateUseCase = new UpdateMinimap();
-  const adapterRef = useRef<BrowserMinimapAdapter | null>(null);
-  const gamepadAdapterRef = useRef<BrowserGamepadAdapter | null>(null);
+  // Memoize use case and adapters to prevent recreation on every render
+  const updateUseCase = useMemo(() => new UpdateMinimap(), []);
+  const adapter = useMemo(() => new BrowserMinimapAdapter(), []);
+  const gamepadAdapter = useMemo(() => new BrowserGamepadAdapter(), []);
 
-  // Initialize adapters
-  if (!adapterRef.current) {
-    adapterRef.current = new BrowserMinimapAdapter();
-  }
-
-  if (!gamepadAdapterRef.current) {
-    gamepadAdapterRef.current = new BrowserGamepadAdapter();
-  }
-
-  const adapter = adapterRef.current;
-  const gamepadAdapter = gamepadAdapterRef.current;
+  // Track visibility state for interval
+  const isVisibleRef = useRef(minimapState.isVisible);
+  useEffect(() => {
+    isVisibleRef.current = minimapState.isVisible;
+  }, [minimapState.isVisible]);
 
   // Update player position when it changes
   useEffect(() => {
     setMinimapState((current) =>
       updateUseCase.updatePlayerPosition(current, playerPosition)
     );
-  }, [playerPosition.x, playerPosition.y]);
+  }, [playerPosition.x, playerPosition.y, updateUseCase]);
 
   // Update player rotation when it changes
   useEffect(() => {
     setMinimapState((current) =>
       updateUseCase.updatePlayerRotation(current, playerRotation)
     );
-  }, [playerRotation]);
+  }, [playerRotation, updateUseCase]);
 
   // Update POIs when they change
   useEffect(() => {
     setMinimapState((current) => updateUseCase.updatePOIs(current, pointsOfInterest));
-  }, [pointsOfInterest]);
+  }, [pointsOfInterest, updateUseCase]);
 
   // Check for new POIs entering range and announce them
   useEffect(() => {
@@ -103,19 +98,23 @@ export const useMinimap = ({
 
       return newState;
     });
-  }, [playerPosition.x, playerPosition.y, pointsOfInterest, enableAudioPings, adapter]);
+  }, [playerPosition.x, playerPosition.y, pointsOfInterest, enableAudioPings, adapter, updateUseCase]);
 
   // Announce nearby POIs periodically for screen readers
   useEffect(() => {
-    if (!minimapState.isVisible) return;
-
+    // Use ref to avoid recreating interval when state changes
     const announceInterval = setInterval(() => {
-      const summary = updateUseCase.getAccessibleSummary(minimapState);
-      adapter.announce(summary);
+      if (isVisibleRef.current) {
+        setMinimapState((current) => {
+          const summary = updateUseCase.getAccessibleSummary(current);
+          adapter.announce(summary);
+          return current;
+        });
+      }
     }, 10000); // Announce every 10 seconds
 
     return () => clearInterval(announceInterval);
-  }, [minimapState, adapter]);
+  }, [adapter, updateUseCase]); // Only recreate if adapter/useCase change (never)
 
   // Toggle visibility
   const handleToggleVisibility = useCallback(() => {
@@ -124,7 +123,7 @@ export const useMinimap = ({
       adapter.announceToggle(newState.isVisible);
       return newState;
     });
-  }, [adapter]);
+  }, [adapter, updateUseCase]);
 
   // Zoom handlers
   const handleZoomIn = useCallback(() => {
@@ -133,7 +132,7 @@ export const useMinimap = ({
       adapter.announceZoom(newState.zoom);
       return newState;
     });
-  }, [adapter]);
+  }, [adapter, updateUseCase]);
 
   const handleZoomOut = useCallback(() => {
     setMinimapState((current) => {
@@ -141,7 +140,7 @@ export const useMinimap = ({
       adapter.announceZoom(newState.zoom);
       return newState;
     });
-  }, [adapter]);
+  }, [adapter, updateUseCase]);
 
   // POI focus handlers
   const handleFocusNextPOI = useCallback(() => {
@@ -156,7 +155,7 @@ export const useMinimap = ({
       }
       return newState;
     });
-  }, [adapter]);
+  }, [adapter, updateUseCase]);
 
   const handleFocusPreviousPOI = useCallback(() => {
     setMinimapState((current) => {
@@ -170,7 +169,7 @@ export const useMinimap = ({
       }
       return newState;
     });
-  }, [adapter]);
+  }, [adapter, updateUseCase]);
 
   const handlePOIClick = useCallback(
     (poi: POI) => {
@@ -188,7 +187,7 @@ export const useMinimap = ({
     if (focusedPOI) {
       handlePOIClick(focusedPOI);
     }
-  }, [minimapState, handlePOIClick]);
+  }, [minimapState, handlePOIClick, updateUseCase]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -321,7 +320,8 @@ export const useMinimap = ({
       adapter.cleanup();
       gamepadAdapter.cleanup();
     };
-  }, [adapter, gamepadAdapter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - cleanup only on unmount
 
   return {
     isVisible: minimapState.isVisible,

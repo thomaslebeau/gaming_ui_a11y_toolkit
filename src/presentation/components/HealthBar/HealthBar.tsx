@@ -32,6 +32,7 @@ export const HealthBar = ({
   const [displayPercentage, setDisplayPercentage] = useState(percentage);
   const previousPercentageRef = useRef(percentage);
   const announcementTimeoutRef = useRef<NodeJS.Timeout>();
+  const resetAnnounceTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Live region for screen reader announcements
   const [announcement, setAnnouncement] = useState("");
@@ -91,18 +92,24 @@ export const HealthBar = ({
         setAnnouncement(`${label}: ${statusText}, ${valueText}`);
         setShouldAnnounce(true);
 
-        // Reset announce flag after announcement
-        setTimeout(() => setShouldAnnounce(false), 100);
+        // Reset announce flag after announcement - store in ref for cleanup
+        if (resetAnnounceTimeoutRef.current) {
+          clearTimeout(resetAnnounceTimeoutRef.current);
+        }
+        resetAnnounceTimeoutRef.current = setTimeout(() => setShouldAnnounce(false), 100);
       }, 500); // 500ms debounce
     } else {
       setDisplayPercentage(percentage);
       previousPercentageRef.current = percentage;
     }
 
-    // Cleanup
+    // Cleanup - clear both timeouts
     return () => {
       if (announcementTimeoutRef.current) {
         clearTimeout(announcementTimeoutRef.current);
+      }
+      if (resetAnnounceTimeoutRef.current) {
+        clearTimeout(resetAnnounceTimeoutRef.current);
       }
     };
   }, [current, max, percentage, colorStatus, label, showPercentage, healthState]);

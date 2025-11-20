@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { MenuState } from "../../domain/entities/MenuState";
 import { NavigateMenu } from "../../application/useCases/NavigateMenu";
 import { BrowserGamepadAdapter } from "../../infrastructure/adapters/BrowserGamepadAdapter";
@@ -16,16 +16,17 @@ export const useMenuNavigation = (
     MenuState.create(itemCount, defaultFocusIndex)
   );
 
-  const navigateMenu = new NavigateMenu();
+  // Memoize use case to prevent recreation on every render
+  const navigateMenu = useMemo(() => new NavigateMenu(), []);
 
   // Handle navigation actions
   const handleNavigateUp = useCallback(() => {
     setMenuState((current) => navigateMenu.navigateUp(current));
-  }, []);
+  }, [navigateMenu]);
 
   const handleNavigateDown = useCallback(() => {
     setMenuState((current) => navigateMenu.navigateDown(current));
-  }, []);
+  }, [navigateMenu]);
 
   // Update menu state when item count changes
   useEffect(() => {
@@ -49,9 +50,11 @@ export const useMenuNavigation = (
   }, [handleNavigateUp, handleNavigateDown]);
 
   // Gamepad navigation (D-pad Up = button 12, D-pad Down = button 13)
+  // Memoize adapter to prevent recreation
+  const gamepadAdapter = useMemo(() => new BrowserGamepadAdapter(), []);
+
   useEffect(() => {
-    const adapter = new BrowserGamepadAdapter();
-    const useCase = new DetectGamepadConnection(adapter);
+    const useCase = new DetectGamepadConnection(gamepadAdapter);
 
     let lastButtonState = { up: false, down: false };
 
@@ -78,7 +81,7 @@ export const useMenuNavigation = (
     );
 
     return cleanup;
-  }, [handleNavigateUp, handleNavigateDown]);
+  }, [handleNavigateUp, handleNavigateDown, gamepadAdapter]);
 
   return {
     focusedIndex: menuState.focusedIndex,
