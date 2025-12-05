@@ -79,6 +79,15 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
   // Track last navigation time for debouncing
   const lastNavigationTime = useRef<number>(0);
 
+  useEffect(() => {
+    if (focusedId === null && elementsRef.current.size > 0) {
+      const firstElement = Array.from(elementsRef.current.values())[0];
+      if (firstElement && !firstElement.disabled) {
+        setFocusedId(firstElement.id);
+      }
+    }
+  }, [focusedId]);
+
   /**
    * Trigger haptic feedback on connected gamepads
    */

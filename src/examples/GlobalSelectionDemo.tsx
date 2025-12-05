@@ -5,49 +5,75 @@
  * Shows a header menu and a central menu working together
  */
 
-import React, { useState } from 'react';
-import { FocusProvider, useFocusable, useFocusContext } from '../index';
-import './GlobalSelectionDemo.css';
+import React, { useState } from "react";
+import { FocusProvider, useFocusable, useFocusContext } from "../index";
+import "./GlobalSelectionDemo.css";
+
+/**
+ * Header Button Component (extracted from loop)
+ */
+interface HeaderButtonProps {
+  id: string;
+  label: string;
+  icon: string;
+  onSelect: (label: string) => void;
+  autoFocus?: boolean;
+}
+
+const HeaderButton: React.FC<HeaderButtonProps> = ({
+  id,
+  label,
+  icon,
+  onSelect,
+  autoFocus = false,
+}) => {
+  const focusable = useFocusable({
+    id,
+    group: "header",
+    onActivate: () => onSelect(label),
+    autoFocus,
+    priority: 100,
+  });
+
+  return (
+    <button
+      {...focusable.focusProps}
+      className={`header-button ${focusable.isFocused ? "focused" : ""}`}
+    >
+      <span className="header-icon">{icon}</span>
+      <span className="header-label">{label}</span>
+    </button>
+  );
+};
 
 /**
  * Header Menu Component
- * Horizontal menu at the top of the page
  */
 const HeaderMenu: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
   const headerItems = [
-    { id: 'header-library', label: '📚 Library', icon: '📚' },
-    { id: 'header-store', label: '🛒 Store', icon: '🛒' },
-    { id: 'header-community', label: '👥 Community', icon: '👥' },
-    { id: 'header-profile', label: '👤 Profile', icon: '👤' },
-    { id: 'header-settings', label: '⚙️ Settings', icon: '⚙️' },
+    { id: "header-library", label: "📚 Library", icon: "📚" },
+    { id: "header-store", label: "🛒 Store", icon: "🛒" },
+    { id: "header-community", label: "👥 Community", icon: "👥" },
+    { id: "header-profile", label: "👤 Profile", icon: "👤" },
+    { id: "header-settings", label: "⚙️ Settings", icon: "⚙️" },
   ];
 
   return (
     <header className="header-menu">
       <div className="header-logo">🎮 GameHub</div>
       <nav className="header-nav">
-        {headerItems.map((item, index) => {
-          const focusable = useFocusable({
-            id: item.id,
-            group: 'header',
-            onActivate: () => setSelectedItem(item.label),
-            autoFocus: index === 0, // Auto-focus first item
-            priority: 100, // Higher priority for header
-          });
-
-          return (
-            <button
-              key={item.id}
-              {...focusable.focusProps}
-              className={`header-button ${focusable.isFocused ? 'focused' : ''}`}
-            >
-              <span className="header-icon">{item.icon}</span>
-              <span className="header-label">{item.label}</span>
-            </button>
-          );
-        })}
+        {headerItems.map((item, index) => (
+          <HeaderButton
+            key={item.id}
+            id={item.id}
+            label={item.label}
+            icon={item.icon}
+            onSelect={setSelectedItem}
+            autoFocus={index === 0}
+          />
+        ))}
       </nav>
       {selectedItem && (
         <div className="header-status">
@@ -59,49 +85,103 @@ const HeaderMenu: React.FC = () => {
 };
 
 /**
+ * Menu Item Component (extracted from loop)
+ */
+interface MenuItemProps {
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+  onSelect: (label: string) => void;
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({
+  id,
+  label,
+  icon,
+  description,
+  onSelect,
+}) => {
+  const focusable = useFocusable({
+    id,
+    group: "main-menu",
+    onActivate: () => onSelect(label),
+  });
+
+  return (
+    <div
+      {...focusable.focusProps}
+      className={`central-menu-item ${focusable.isFocused ? "focused" : ""}`}
+    >
+      <div className="menu-item-icon">{icon}</div>
+      <div className="menu-item-content">
+        <div className="menu-item-label">{label}</div>
+        <div className="menu-item-description">{description}</div>
+      </div>
+      {focusable.isFocused && <div className="menu-item-indicator">→</div>}
+    </div>
+  );
+};
+
+/**
  * Central Menu Component
- * Main vertical menu in the center area
  */
 const CentralMenu: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
   const menuItems = [
-    { id: 'menu-new-game', label: 'New Game', icon: '🆕', description: 'Start a new game' },
-    { id: 'menu-continue', label: 'Continue', icon: '▶️', description: 'Resume your progress' },
-    { id: 'menu-load-game', label: 'Load Game', icon: '📂', description: 'Load a saved game' },
-    { id: 'menu-multiplayer', label: 'Multiplayer', icon: '🌐', description: 'Play with friends' },
-    { id: 'menu-challenges', label: 'Challenges', icon: '🏆', description: 'Complete challenges' },
-    { id: 'menu-achievements', label: 'Achievements', icon: '⭐', description: 'View your achievements' },
+    {
+      id: "menu-new-game",
+      label: "New Game",
+      icon: "🆕",
+      description: "Start a new game",
+    },
+    {
+      id: "menu-continue",
+      label: "Continue",
+      icon: "▶️",
+      description: "Resume your progress",
+    },
+    {
+      id: "menu-load-game",
+      label: "Load Game",
+      icon: "📂",
+      description: "Load a saved game",
+    },
+    {
+      id: "menu-multiplayer",
+      label: "Multiplayer",
+      icon: "🌐",
+      description: "Play with friends",
+    },
+    {
+      id: "menu-challenges",
+      label: "Challenges",
+      icon: "🏆",
+      description: "Complete challenges",
+    },
+    {
+      id: "menu-achievements",
+      label: "Achievements",
+      icon: "⭐",
+      description: "View your achievements",
+    },
   ];
 
   return (
     <div className="central-menu-container">
       <h2 className="central-menu-title">Main Menu</h2>
       <nav className="central-menu">
-        {menuItems.map((item) => {
-          const focusable = useFocusable({
-            id: item.id,
-            group: 'main-menu',
-            onActivate: () => setSelectedGame(item.label),
-          });
-
-          return (
-            <div
-              key={item.id}
-              {...focusable.focusProps}
-              className={`central-menu-item ${focusable.isFocused ? 'focused' : ''}`}
-            >
-              <div className="menu-item-icon">{item.icon}</div>
-              <div className="menu-item-content">
-                <div className="menu-item-label">{item.label}</div>
-                <div className="menu-item-description">{item.description}</div>
-              </div>
-              {focusable.isFocused && (
-                <div className="menu-item-indicator">→</div>
-              )}
-            </div>
-          );
-        })}
+        {menuItems.map((item) => (
+          <MenuItem
+            key={item.id}
+            id={item.id}
+            label={item.label}
+            icon={item.icon}
+            description={item.description}
+            onSelect={setSelectedGame}
+          />
+        ))}
       </nav>
       {selectedGame && (
         <div className="central-menu-selection">
@@ -113,41 +193,64 @@ const CentralMenu: React.FC = () => {
 };
 
 /**
+ * Quick Action Button Component (extracted from loop)
+ */
+interface QuickActionButtonProps {
+  id: string;
+  label: string;
+  icon: string;
+  onSelect: (label: string) => void;
+}
+
+const QuickActionButton: React.FC<QuickActionButtonProps> = ({
+  id,
+  label,
+  icon,
+  onSelect,
+}) => {
+  const focusable = useFocusable({
+    id,
+    group: "quick-actions",
+    onActivate: () => onSelect(label),
+  });
+
+  return (
+    <button
+      {...focusable.focusProps}
+      className={`quick-action-button ${focusable.isFocused ? "focused" : ""}`}
+    >
+      <span className="action-icon">{icon}</span>
+      <span className="action-label">{label}</span>
+    </button>
+  );
+};
+
+/**
  * Quick Actions Panel
- * Additional focusable elements in a side panel
  */
 const QuickActionsPanel: React.FC = () => {
   const [lastAction, setLastAction] = useState<string | null>(null);
 
   const quickActions = [
-    { id: 'quick-favorites', label: 'Favorites', icon: '❤️' },
-    { id: 'quick-recent', label: 'Recent', icon: '🕐' },
-    { id: 'quick-downloads', label: 'Downloads', icon: '⬇️' },
-    { id: 'quick-friends', label: 'Friends', icon: '👫' },
+    { id: "quick-favorites", label: "Favorites", icon: "❤️" },
+    { id: "quick-recent", label: "Recent", icon: "🕐" },
+    { id: "quick-downloads", label: "Downloads", icon: "⬇️" },
+    { id: "quick-friends", label: "Friends", icon: "👫" },
   ];
 
   return (
     <aside className="quick-actions-panel">
       <h3 className="panel-title">Quick Access</h3>
       <div className="quick-actions">
-        {quickActions.map((action) => {
-          const focusable = useFocusable({
-            id: action.id,
-            group: 'quick-actions',
-            onActivate: () => setLastAction(action.label),
-          });
-
-          return (
-            <button
-              key={action.id}
-              {...focusable.focusProps}
-              className={`quick-action-button ${focusable.isFocused ? 'focused' : ''}`}
-            >
-              <span className="action-icon">{action.icon}</span>
-              <span className="action-label">{action.label}</span>
-            </button>
-          );
-        })}
+        {quickActions.map((action) => (
+          <QuickActionButton
+            key={action.id}
+            id={action.id}
+            label={action.label}
+            icon={action.icon}
+            onSelect={setLastAction}
+          />
+        ))}
       </div>
       {lastAction && (
         <div className="panel-status">
@@ -159,8 +262,7 @@ const QuickActionsPanel: React.FC = () => {
 };
 
 /**
- * Game Cards Grid
- * Grid of game cards that can be focused
+ * Game Card Component (already correct - separate component)
  */
 interface GameCardProps {
   id: string;
@@ -171,17 +273,24 @@ interface GameCardProps {
   onSelect: () => void;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ id, title, genre, rating, image, onSelect }) => {
+const GameCard: React.FC<GameCardProps> = ({
+  id,
+  title,
+  genre,
+  rating,
+  image,
+  onSelect,
+}) => {
   const focusable = useFocusable({
     id,
-    group: 'game-cards',
+    group: "game-cards",
     onActivate: onSelect,
   });
 
   return (
     <div
       {...focusable.focusProps}
-      className={`game-card ${focusable.isFocused ? 'focused' : ''}`}
+      className={`game-card ${focusable.isFocused ? "focused" : ""}`}
     >
       <div className="game-card-image">{image}</div>
       <div className="game-card-content">
@@ -204,12 +313,48 @@ const GameCardsGrid: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
   const games = [
-    { id: 'game-1', title: 'Cyber Quest', genre: 'RPG', rating: '4.8', image: '🎮' },
-    { id: 'game-2', title: 'Speed Racer', genre: 'Racing', rating: '4.5', image: '🏎️' },
-    { id: 'game-3', title: 'Puzzle Master', genre: 'Puzzle', rating: '4.9', image: '🧩' },
-    { id: 'game-4', title: 'Space Battle', genre: 'Action', rating: '4.7', image: '🚀' },
-    { id: 'game-5', title: 'Farm Life', genre: 'Simulation', rating: '4.6', image: '🌾' },
-    { id: 'game-6', title: 'Mystery Island', genre: 'Adventure', rating: '4.8', image: '🏝️' },
+    {
+      id: "game-1",
+      title: "Cyber Quest",
+      genre: "RPG",
+      rating: "4.8",
+      image: "🎮",
+    },
+    {
+      id: "game-2",
+      title: "Speed Racer",
+      genre: "Racing",
+      rating: "4.5",
+      image: "🏎️",
+    },
+    {
+      id: "game-3",
+      title: "Puzzle Master",
+      genre: "Puzzle",
+      rating: "4.9",
+      image: "🧩",
+    },
+    {
+      id: "game-4",
+      title: "Space Battle",
+      genre: "Action",
+      rating: "4.7",
+      image: "🚀",
+    },
+    {
+      id: "game-5",
+      title: "Farm Life",
+      genre: "Simulation",
+      rating: "4.6",
+      image: "🌾",
+    },
+    {
+      id: "game-6",
+      title: "Mystery Island",
+      genre: "Adventure",
+      rating: "4.8",
+      image: "🏝️",
+    },
   ];
 
   return (
@@ -219,7 +364,11 @@ const GameCardsGrid: React.FC = () => {
         {games.map((game) => (
           <GameCard
             key={game.id}
-            {...game}
+            id={game.id}
+            title={game.title}
+            genre={game.genre}
+            rating={game.rating}
+            image={game.image}
             onSelect={() => setSelectedGame(game.title)}
           />
         ))}
@@ -245,14 +394,18 @@ const StatusDisplay: React.FC = () => {
       <div className="status-item">
         <span className="status-icon">🎮</span>
         <span className="status-label">Gamepad:</span>
-        <span className={`status-badge ${isGamepadConnected ? 'connected' : 'disconnected'}`}>
-          {isGamepadConnected ? 'Connected' : 'Not Connected'}
+        <span
+          className={`status-badge ${
+            isGamepadConnected ? "connected" : "disconnected"
+          }`}
+        >
+          {isGamepadConnected ? "Connected" : "Not Connected"}
         </span>
       </div>
       <div className="status-item">
         <span className="status-icon">🎯</span>
         <span className="status-label">Focus:</span>
-        <span className="status-value">{focusedId || 'None'}</span>
+        <span className="status-value">{focusedId || "None"}</span>
       </div>
     </div>
   );
@@ -280,7 +433,8 @@ const GlobalSelectionDemoContent: React.FC = () => {
           <div className="welcome-banner">
             <h1>🎮 Global Selection System Demo</h1>
             <p className="demo-subtitle">
-              Navigate between different menus and elements using arrow keys, Tab, or gamepad
+              Navigate between different menus and elements using arrow keys,
+              Tab, or gamepad
             </p>
             <StatusDisplay />
           </div>

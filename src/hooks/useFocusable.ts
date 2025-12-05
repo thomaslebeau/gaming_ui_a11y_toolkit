@@ -6,7 +6,7 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import { useFocusContext } from './useFocusContext';
-import type { UseFocusableOptions, UseFocusableReturn } from '../types/focus.types';
+import type{ UseFocusableOptions, UseFocusableReturn } from '../types/focus.types';
 
 /**
  * Make an element focusable in the global focus management system
@@ -59,7 +59,7 @@ export const useFocusable = ({
    * Register/update element when options change
    */
   useEffect(() => {
-    if (disabled) return;
+    if (disabled || !ref.current) return;
 
     const position = getPosition();
 
@@ -75,7 +75,7 @@ export const useFocusable = ({
     });
 
     // Auto-focus if requested
-    if (autoFocus && ref.current) {
+    if (autoFocus) {
       context.setFocus(id);
     }
 
