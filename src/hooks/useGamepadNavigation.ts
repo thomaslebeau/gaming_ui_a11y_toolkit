@@ -3,6 +3,7 @@
  *
  * Custom hook for handling gamepad navigation in menus
  * Supports D-Pad and left joystick navigation
+ * Now supports both vertical and horizontal navigation!
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -29,6 +30,8 @@ interface UseGamepadNavigationProps {
    */
   onActivate?: (index: number) => void;
 
+  onConfirm?: (index: number) => void;
+
   /**
    * Enable haptic feedback
    * @default true
@@ -46,6 +49,14 @@ interface UseGamepadNavigationProps {
    * @default 200
    */
   navigationDelay?: number;
+
+  /**
+   * Navigation direction - determines which buttons/axes to use
+   * - 'vertical': UP/DOWN (D-Pad up/down, left stick Y-axis)
+   * - 'horizontal': LEFT/RIGHT (D-Pad left/right, left stick X-axis)
+   * @default 'vertical'
+   */
+  direction?: 'vertical' | 'horizontal';
 }
 
 interface UseGamepadNavigationReturn {
@@ -94,15 +105,17 @@ export const useGamepadNavigation = ({
   initialIndex = 0,
   onSelectionChange,
   onActivate,
+  onConfirm,
   enableHapticFeedback = true,
   joystickDeadzone = 0.5,
   navigationDelay = 200,
+  direction = 'vertical',
 }: UseGamepadNavigationProps): UseGamepadNavigationReturn => {
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
   const [isGamepadConnected, setIsGamepadConnected] = useState(false);
   const lastNavigationTime = useRef<number>(0);
   const previousButtonStates = useRef<Map<number, boolean>>(new Map());
-  const previousAxisDirection = useRef<'up' | 'down' | null>(null);
+  const previousAxisDirection = useRef<'previous' | 'next' | null>(null);
 
   /**
    * Trigger haptic feedback on gamepad
@@ -154,16 +167,16 @@ export const useGamepadNavigation = ({
   }, [selectedIndex, itemCount, onSelectionChange, triggerHapticFeedback, navigationDelay]);
 
   /**
-   * Move selection up
+   * Move selection to previous item
    */
-  const moveUp = useCallback(() => {
+  const movePrevious = useCallback(() => {
     navigateToIndex(selectedIndex - 1);
   }, [selectedIndex, navigateToIndex]);
 
   /**
-   * Move selection down
+   * Move selection to next item
    */
-  const moveDown = useCallback(() => {
+  const moveNext = useCallback(() => {
     navigateToIndex(selectedIndex + 1);
   }, [selectedIndex, navigateToIndex]);
 
@@ -181,6 +194,19 @@ export const useGamepadNavigation = ({
   useEffect(() => {
     let animationId: number;
 
+    // Determine which buttons and axes to use based on direction
+    const previousButton = direction === 'horizontal' 
+      ? GAMEPAD_BUTTONS.DPAD_LEFT 
+      : GAMEPAD_BUTTONS.DPAD_UP;
+    
+    const nextButton = direction === 'horizontal'
+      ? GAMEPAD_BUTTONS.DPAD_RIGHT
+      : GAMEPAD_BUTTONS.DPAD_DOWN;
+
+    const stickAxis = direction === 'horizontal'
+      ? GAMEPAD_AXES.LEFT_STICK_X
+      : GAMEPAD_AXES.LEFT_STICK_Y;
+
     const pollGamepad = () => {
       const gamepads = navigator.getGamepads();
       let hasActiveGamepad = false;
@@ -191,21 +217,21 @@ export const useGamepadNavigation = ({
 
         hasActiveGamepad = true;
 
-        // Check D-Pad Up button
-        const dpadUpPressed = gamepad.buttons[GAMEPAD_BUTTONS.DPAD_UP]?.pressed || false;
-        const wasDpadUpPressed = previousButtonStates.current.get(GAMEPAD_BUTTONS.DPAD_UP) || false;
-        if (dpadUpPressed && !wasDpadUpPressed) {
-          moveUp();
+        // Check D-Pad Previous button (UP or LEFT)
+        const prevButtonPressed = gamepad.buttons[previousButton]?.pressed || false;
+        const wasPrevButtonPressed = previousButtonStates.current.get(previousButton) || false;
+        if (prevButtonPressed && !wasPrevButtonPressed) {
+          movePrevious();
         }
-        previousButtonStates.current.set(GAMEPAD_BUTTONS.DPAD_UP, dpadUpPressed);
+        previousButtonStates.current.set(previousButton, prevButtonPressed);
 
-        // Check D-Pad Down button
-        const dpadDownPressed = gamepad.buttons[GAMEPAD_BUTTONS.DPAD_DOWN]?.pressed || false;
-        const wasDpadDownPressed = previousButtonStates.current.get(GAMEPAD_BUTTONS.DPAD_DOWN) || false;
-        if (dpadDownPressed && !wasDpadDownPressed) {
-          moveDown();
+        // Check D-Pad Next button (DOWN or RIGHT)
+        const nextButtonPressed = gamepad.buttons[nextButton]?.pressed || false;
+        const wasNextButtonPressed = previousButtonStates.current.get(nextButton) || false;
+        if (nextButtonPressed && !wasNextButtonPressed) {
+          moveNext();
         }
-        previousButtonStates.current.set(GAMEPAD_BUTTONS.DPAD_DOWN, dpadDownPressed);
+        previousButtonStates.current.set(nextButton, nextButtonPressed);
 
         // Check A button (activate)
         const aButtonPressed = gamepad.buttons[GAMEPAD_BUTTONS.A]?.pressed || false;
@@ -215,23 +241,33 @@ export const useGamepadNavigation = ({
         }
         previousButtonStates.current.set(GAMEPAD_BUTTONS.A, aButtonPressed);
 
-        // Check left joystick Y-axis
-        const leftStickY = gamepad.axes[GAMEPAD_AXES.LEFT_STICK_Y] || 0;
-
-        if (leftStickY < -joystickDeadzone) {
-          // Joystick pushed up
-          if (previousAxisDirection.current !== 'up') {
-            previousAxisDirection.current = 'up';
-            moveUp();
+         if (onConfirm) {
+          const startPressed = gamepad.buttons[GAMEPAD_BUTTONS.START]?.pressed || false;
+          const wasStartPressed = previousButtonStates.current.get(GAMEPAD_BUTTONS.START) || false;
+          if (startPressed && !wasStartPressed) {
+            triggerHapticFeedback(0.5);
+            onConfirm(selectedIndex);
           }
-        } else if (leftStickY > joystickDeadzone) {
-          // Joystick pushed down
-          if (previousAxisDirection.current !== 'down') {
-            previousAxisDirection.current = 'down';
-            moveDown();
+          previousButtonStates.current.set(GAMEPAD_BUTTONS.START, startPressed);
+        }
+
+        // Check joystick axis (Y-axis for vertical, X-axis for horizontal)
+        const axisValue = gamepad.axes[stickAxis] || 0;
+
+        if (axisValue < -joystickDeadzone) {
+          // Stick pushed in "previous" direction (up for vertical, left for horizontal)
+          if (previousAxisDirection.current !== 'previous') {
+            previousAxisDirection.current = 'previous';
+            movePrevious();
+          }
+        } else if (axisValue > joystickDeadzone) {
+          // Stick pushed in "next" direction (down for vertical, right for horizontal)
+          if (previousAxisDirection.current !== 'next') {
+            previousAxisDirection.current = 'next';
+            moveNext();
           }
         } else {
-          // Joystick in neutral position
+          // Stick in neutral position
           previousAxisDirection.current = null;
         }
       }
@@ -262,7 +298,7 @@ export const useGamepadNavigation = ({
       window.removeEventListener('gamepadconnected', handleGamepadConnected);
       window.removeEventListener('gamepaddisconnected', handleGamepadDisconnected);
     };
-  }, [moveUp, moveDown, activateCurrentItem, joystickDeadzone]);
+  }, [movePrevious, moveNext, activateCurrentItem, joystickDeadzone, direction, onConfirm]);
 
   return {
     selectedIndex,

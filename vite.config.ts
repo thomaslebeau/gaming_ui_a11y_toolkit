@@ -12,6 +12,7 @@ export default defineConfig({
       exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/App.tsx', 'src/main.tsx', 'src/vite-env.d.ts'],
       outDir: 'dist',
       tsconfigPath: './tsconfig.build.json',
+      insertTypesEntry: true,
     }),
   ],
   build: {
