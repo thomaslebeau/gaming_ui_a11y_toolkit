@@ -6,7 +6,7 @@
 
 import { useContext } from 'react';
 import { FocusContext } from '../context/FocusContext';
-import { FocusContextValue } from '../types/focus.types';
+import type { FocusContextValue } from '../types/focus.types';
 
 /**
  * Hook to access the focus context

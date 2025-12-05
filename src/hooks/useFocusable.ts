@@ -6,7 +6,7 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import { useFocusContext } from './useFocusContext';
-import { UseFocusableOptions, UseFocusableReturn } from '../types/focus.types';
+import type { UseFocusableOptions, UseFocusableReturn } from '../types/focus.types';
 
 /**
  * Make an element focusable in the global focus management system

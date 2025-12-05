@@ -4,7 +4,12 @@
  * Type definitions for the global focus management system
  */
 
-import { ReactNode } from 'react';
+/**
+ * Gaming UI A11y Toolkit - Focus Management Types
+ *
+ * Type definitions for the global focus management system
+ */
+import type { ReactNode } from 'react';
 
 /**
  * Direction of navigation

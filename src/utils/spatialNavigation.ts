@@ -5,7 +5,7 @@
  * Inspired by console UI navigation systems
  */
 
-import { FocusableElement, NavigationDirection } from '../types/focus.types';
+import type { FocusableElement, NavigationDirection } from '../types/focus.types';
 
 /**
  * Find the closest element in a given direction using spatial navigation

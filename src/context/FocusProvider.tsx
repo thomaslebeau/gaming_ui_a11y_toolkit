@@ -5,19 +5,19 @@
  * Handles gamepad input, spatial navigation, and focus state
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FocusContext } from './FocusContext';
-import {
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { FocusContext } from "./FocusContext";
+import type {
   FocusableElement,
   FocusProviderProps,
   FocusContextValue,
   NavigationDirection,
-} from '../types/focus.types';
+} from "../types/focus.types";
 import {
   findClosestElement,
   findNextSequential,
   findPreviousSequential,
-} from '../utils/spatialNavigation';
+} from "../utils/spatialNavigation";
 
 /**
  * Standard gamepad button indices
@@ -61,7 +61,7 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
   children,
   enableHapticFeedback = true,
   joystickDeadzone = 0.5,
-  navigationMode = 'spatial',
+  navigationMode = "spatial",
   navigationDelay = 150,
 }) => {
   const [focusedId, setFocusedId] = useState<string | null>(null);
@@ -90,11 +90,11 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
         const gamepads = navigator.getGamepads();
         for (let i = 0; i < gamepads.length; i++) {
           const gamepad = gamepads[i];
-          if (gamepad && 'vibrationActuator' in gamepad) {
+          if (gamepad && "vibrationActuator" in gamepad) {
             const actuator = gamepad.vibrationActuator as any;
-            if (actuator && typeof actuator.playEffect === 'function') {
+            if (actuator && typeof actuator.playEffect === "function") {
               actuator
-                .playEffect('dual-rumble', {
+                .playEffect("dual-rumble", {
                   startDelay: 0,
                   duration: 50,
                   weakMagnitude: intensity,
@@ -127,7 +127,7 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
     elementsRef.current.delete(id);
 
     // If we just unregistered the focused element, clear focus
-    setFocusedId(current => (current === id ? null : current));
+    setFocusedId((current) => (current === id ? null : current));
   }, []);
 
   /**
@@ -143,19 +143,22 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
   /**
    * Set focus to a specific element
    */
-  const setFocus = useCallback((id: string) => {
-    const element = elementsRef.current.get(id);
-    if (element && !element.disabled) {
-      setFocusedId(id);
+  const setFocus = useCallback(
+    (id: string) => {
+      const element = elementsRef.current.get(id);
+      if (element && !element.disabled) {
+        setFocusedId(id);
 
-      // Scroll element into view if needed
-      if (element.ref.current) {
-        element.ref.current.focus({ preventScroll: false });
+        // Scroll element into view if needed
+        if (element.ref.current) {
+          element.ref.current.focus({ preventScroll: false });
+        }
+
+        triggerHapticFeedback(0.2);
       }
-
-      triggerHapticFeedback(0.2);
-    }
-  }, [triggerHapticFeedback]);
+    },
+    [triggerHapticFeedback]
+  );
 
   /**
    * Navigate in a specific direction
@@ -178,7 +181,7 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
 
       let nextElement: FocusableElement | null = null;
 
-      if (navigationMode === 'spatial') {
+      if (navigationMode === "spatial") {
         nextElement = findClosestElement(
           currentElement,
           direction,
@@ -186,7 +189,7 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
         );
       } else {
         // Sequential mode: map directions to next/previous
-        if (direction === 'down' || direction === 'right') {
+        if (direction === "down" || direction === "right") {
           nextElement = findNextSequential(focusedId, elementsRef.current);
         } else {
           nextElement = findPreviousSequential(focusedId, elementsRef.current);
@@ -224,10 +227,22 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
   /**
    * Navigation direction callbacks
    */
-  const navigateUp = useCallback(() => navigateInDirection('up'), [navigateInDirection]);
-  const navigateDown = useCallback(() => navigateInDirection('down'), [navigateInDirection]);
-  const navigateLeft = useCallback(() => navigateInDirection('left'), [navigateInDirection]);
-  const navigateRight = useCallback(() => navigateInDirection('right'), [navigateInDirection]);
+  const navigateUp = useCallback(
+    () => navigateInDirection("up"),
+    [navigateInDirection]
+  );
+  const navigateDown = useCallback(
+    () => navigateInDirection("down"),
+    [navigateInDirection]
+  );
+  const navigateLeft = useCallback(
+    () => navigateInDirection("left"),
+    [navigateInDirection]
+  );
+  const navigateRight = useCallback(
+    () => navigateInDirection("right"),
+    [navigateInDirection]
+  );
 
   /**
    * Activate the currently focused element
@@ -272,16 +287,16 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
       if (Math.abs(xAxis) > Math.abs(yAxis)) {
         // Horizontal movement
         if (xAxis < -joystickDeadzone) {
-          currentDirection = 'left';
+          currentDirection = "left";
         } else if (xAxis > joystickDeadzone) {
-          currentDirection = 'right';
+          currentDirection = "right";
         }
       } else {
         // Vertical movement
         if (yAxis < -joystickDeadzone) {
-          currentDirection = 'up';
+          currentDirection = "up";
         } else if (yAxis > joystickDeadzone) {
-          currentDirection = 'down';
+          currentDirection = "down";
         }
       }
 
@@ -352,16 +367,19 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
 
     const handleGamepadDisconnected = () => {
       const gamepads = navigator.getGamepads();
-      const hasGamepad = Array.from(gamepads).some(gp => gp !== null);
+      const hasGamepad = Array.from(gamepads).some((gp) => gp !== null);
       setIsGamepadConnected(hasGamepad);
     };
 
-    window.addEventListener('gamepadconnected', handleGamepadConnected);
-    window.addEventListener('gamepaddisconnected', handleGamepadDisconnected);
+    window.addEventListener("gamepadconnected", handleGamepadConnected);
+    window.addEventListener("gamepaddisconnected", handleGamepadDisconnected);
 
     return () => {
-      window.removeEventListener('gamepadconnected', handleGamepadConnected);
-      window.removeEventListener('gamepaddisconnected', handleGamepadDisconnected);
+      window.removeEventListener("gamepadconnected", handleGamepadConnected);
+      window.removeEventListener(
+        "gamepaddisconnected",
+        handleGamepadDisconnected
+      );
     };
   }, []);
 
@@ -374,28 +392,28 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
       if (elementsRef.current.size === 0) return;
 
       switch (event.key) {
-        case 'ArrowUp':
+        case "ArrowUp":
           event.preventDefault();
           navigateUp();
           break;
-        case 'ArrowDown':
+        case "ArrowDown":
           event.preventDefault();
           navigateDown();
           break;
-        case 'ArrowLeft':
+        case "ArrowLeft":
           event.preventDefault();
           navigateLeft();
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           event.preventDefault();
           navigateRight();
           break;
-        case 'Enter':
-        case ' ':
+        case "Enter":
+        case " ":
           event.preventDefault();
           activate();
           break;
-        case 'Tab':
+        case "Tab":
           event.preventDefault();
           if (event.shiftKey) {
             focusPrevious();
@@ -406,12 +424,20 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [navigateUp, navigateDown, navigateLeft, navigateRight, activate, focusNext, focusPrevious]);
+  }, [
+    navigateUp,
+    navigateDown,
+    navigateLeft,
+    navigateRight,
+    activate,
+    focusNext,
+    focusPrevious,
+  ]);
 
   const value: FocusContextValue = {
     focusedId,
@@ -429,5 +455,7 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
     activate,
   };
 
-  return <FocusContext.Provider value={value}>{children}</FocusContext.Provider>;
+  return (
+    <FocusContext.Provider value={value}>{children}</FocusContext.Provider>
+  );
 };
