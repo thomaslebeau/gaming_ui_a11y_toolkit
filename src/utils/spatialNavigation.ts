@@ -97,24 +97,31 @@ export const isInDirection = (
   const deltaX = toCenter.x - fromCenter.x;
   const deltaY = toCenter.y - fromCenter.y;
 
+  const absDeltaX = Math.abs(deltaX);
+  const absDeltaY = Math.abs(deltaY);
+
   let result = false;
   switch (direction) {
     case 'up':
-      result = toCenter.y < fromCenter.y;
+      // Must be above AND vertical distance must be dominant
+      result = deltaY < 0 && absDeltaY > absDeltaX;
       break;
     case 'down':
-      result = toCenter.y > fromCenter.y;
+      // Must be below AND vertical distance must be dominant
+      result = deltaY > 0 && absDeltaY > absDeltaX;
       break;
     case 'left':
-      result = toCenter.x < fromCenter.x;
+      // Must be to the left AND horizontal distance must be dominant
+      result = deltaX < 0 && absDeltaX > absDeltaY;
       break;
     case 'right':
-      result = toCenter.x > fromCenter.x;
+      // Must be to the right AND horizontal distance must be dominant
+      result = deltaX > 0 && absDeltaX > absDeltaY;
       break;
   }
 
   if (result) {
-    console.log(`    isInDirection(${direction}): deltaX=${deltaX.toFixed(0)}, deltaY=${deltaY.toFixed(0)}`);
+    console.log(`    isInDirection(${direction}): deltaX=${deltaX.toFixed(0)}, deltaY=${deltaY.toFixed(0)} [dominant ${absDeltaX > absDeltaY ? 'X' : 'Y'}]`);
   }
 
   return result;
