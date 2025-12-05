@@ -56,43 +56,45 @@ export const useFocusable = ({
   }, []);
 
   /**
-   * Register/update element when options change
+   * Store callbacks in refs to avoid re-registration
+   */
+  const onActivateRef = useRef(onActivate);
+  const onNavigateRef = useRef(onNavigate);
+
+  useEffect(() => {
+    onActivateRef.current = onActivate;
+    onNavigateRef.current = onNavigate;
+  }, [onActivate, onNavigate]);
+
+  /**
+   * Update element registration when properties change
    */
   useEffect(() => {
-    if (disabled || !ref.current) return;
+    if (isRegistered.current && ref.current && !disabled) {
+      const position = ref.current.getBoundingClientRect();
 
-    const position = getPosition();
-
-    context.registerElement({
-      id,
-      ref,
-      group,
-      position,
-      onActivate,
-      onNavigate,
-      disabled,
-      priority,
-    });
-
-    // Auto-focus if requested
-    if (autoFocus) {
-      context.setFocus(id);
+      context.registerElement({
+        id,
+        ref,
+        group,
+        position,
+        onActivate: (...args) => onActivateRef.current?.(...args),
+        onNavigate: (...args) => onNavigateRef.current?.(...args) ?? false,
+        disabled,
+        priority,
+      });
     }
+  }, [id, group, disabled, priority, context]);
 
+  /**
+   * Unregister element on unmount
+   */
+  useEffect(() => {
     return () => {
       context.unregisterElement(id);
+      isRegistered.current = false;
     };
-  }, [
-    id,
-    group,
-    onActivate,
-    onNavigate,
-    disabled,
-    autoFocus,
-    priority,
-    context,
-    getPosition,
-  ]);
+  }, [id, context]);
 
   /**
    * Update position on resize and scroll
@@ -121,17 +123,43 @@ export const useFocusable = ({
   }, [id, disabled, context]);
 
   /**
+   * Track if element has been registered
+   */
+  const isRegistered = useRef(false);
+
+  /**
    * Handle DOM ref callback
    */
   const handleRef = useCallback((element: HTMLElement | null) => {
     (ref as React.MutableRefObject<HTMLElement | null>).current = element;
 
-    // Update position when ref changes
-    if (element) {
+    // Register element when ref is first set
+    if (element && !isRegistered.current && !disabled) {
+      const position = element.getBoundingClientRect();
+
+      context.registerElement({
+        id,
+        ref,
+        group,
+        position,
+        onActivate: (...args) => onActivateRef.current?.(...args),
+        onNavigate: (...args) => onNavigateRef.current?.(...args) ?? false,
+        disabled,
+        priority,
+      });
+
+      isRegistered.current = true;
+
+      // Auto-focus if requested
+      if (autoFocus) {
+        context.setFocus(id);
+      }
+    } else if (element && isRegistered.current) {
+      // Just update position if already registered
       const position = element.getBoundingClientRect();
       context.updateElementPosition(id, position);
     }
-  }, [id, context]);
+  }, [id, group, disabled, autoFocus, priority, context]);
 
   /**
    * Handle focus event
