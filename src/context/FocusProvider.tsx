@@ -5,7 +5,7 @@
  * Handles gamepad input, spatial navigation, and focus state
  */
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { FocusContext } from "./FocusContext";
 import type {
   FocusableElement,
@@ -448,21 +448,38 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
     focusPrevious,
   ]);
 
-  const value: FocusContextValue = {
-    focusedId,
-    isGamepadConnected,
-    registerElement,
-    unregisterElement,
-    updateElementPosition,
-    setFocus,
-    focusNext,
-    focusPrevious,
-    navigateUp,
-    navigateDown,
-    navigateLeft,
-    navigateRight,
-    activate,
-  };
+  const value: FocusContextValue = useMemo(
+    () => ({
+      focusedId,
+      isGamepadConnected,
+      registerElement,
+      unregisterElement,
+      updateElementPosition,
+      setFocus,
+      focusNext,
+      focusPrevious,
+      navigateUp,
+      navigateDown,
+      navigateLeft,
+      navigateRight,
+      activate,
+    }),
+    [
+      focusedId,
+      isGamepadConnected,
+      registerElement,
+      unregisterElement,
+      updateElementPosition,
+      setFocus,
+      focusNext,
+      focusPrevious,
+      navigateUp,
+      navigateDown,
+      navigateLeft,
+      navigateRight,
+      activate,
+    ]
+  );
 
   return (
     <FocusContext.Provider value={value}>{children}</FocusContext.Provider>

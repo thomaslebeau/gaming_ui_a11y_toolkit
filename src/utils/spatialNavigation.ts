@@ -38,7 +38,6 @@ export const findClosestElement = (
   // Filter candidates based on direction
   const candidates = allElements.filter(el => {
     if (el.id === from.id) return false;
-
     return isInDirection(from.position, el.position, direction);
   });
 
@@ -77,15 +76,30 @@ export const isInDirection = (
     y: to.top + to.height / 2,
   };
 
+  const deltaX = toCenter.x - fromCenter.x;
+  const deltaY = toCenter.y - fromCenter.y;
+
+  const absDeltaX = Math.abs(deltaX);
+  const absDeltaY = Math.abs(deltaY);
+
+  // Tolerance factor: allows elements within a wider cone
+  // 0.5 means the primary direction must be at least 50% of the secondary
+  // This creates a cone of approximately ±63° from the primary axis
+  const DIRECTION_TOLERANCE = 0.5;
+
   switch (direction) {
     case 'up':
-      return toCenter.y < fromCenter.y;
+      // Must be above AND vertical distance should be significant
+      return deltaY < 0 && absDeltaY >= absDeltaX * DIRECTION_TOLERANCE;
     case 'down':
-      return toCenter.y > fromCenter.y;
+      // Must be below AND vertical distance should be significant
+      return deltaY > 0 && absDeltaY >= absDeltaX * DIRECTION_TOLERANCE;
     case 'left':
-      return toCenter.x < fromCenter.x;
+      // Must be to the left AND horizontal distance should be significant
+      return deltaX < 0 && absDeltaX >= absDeltaY * DIRECTION_TOLERANCE;
     case 'right':
-      return toCenter.x > fromCenter.x;
+      // Must be to the right AND horizontal distance should be significant
+      return deltaX > 0 && absDeltaX >= absDeltaY * DIRECTION_TOLERANCE;
   }
 };
 
@@ -156,10 +170,10 @@ export const calculateNavigationScore = (
     }
   }
 
-  // Weight primary distance more than secondary (alignment)
+  // Weight primary distance MUCH more than secondary (alignment)
   // This ensures we prioritize elements in the correct direction
-  // while still considering alignment
-  return primaryDistance + secondaryDistance * 0.5;
+  // Primary distance is weighted 3x to strongly favor closer elements
+  return primaryDistance * 3 + secondaryDistance * 0.3;
 };
 
 /**

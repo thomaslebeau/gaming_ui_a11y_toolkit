@@ -56,43 +56,65 @@ export const useFocusable = ({
   }, []);
 
   /**
-   * Register/update element when options change
+   * Store callbacks in refs to avoid re-registration
+   */
+  const onActivateRef = useRef(onActivate);
+  const onNavigateRef = useRef(onNavigate);
+
+  /**
+   * Track if element has been registered
+   */
+  const isRegistered = useRef(false);
+
+  /**
+   * Store context functions in refs to avoid recreating callbacks
+   */
+  const registerElementRef = useRef(context.registerElement);
+  const setFocusRef = useRef(context.setFocus);
+  const updateElementPositionRef = useRef(context.updateElementPosition);
+  const unregisterRef = useRef(context.unregisterElement);
+
+  useEffect(() => {
+    onActivateRef.current = onActivate;
+    onNavigateRef.current = onNavigate;
+  }, [onActivate, onNavigate]);
+
+  useEffect(() => {
+    registerElementRef.current = context.registerElement;
+    setFocusRef.current = context.setFocus;
+    updateElementPositionRef.current = context.updateElementPosition;
+    unregisterRef.current = context.unregisterElement;
+  }, [context]);
+
+  /**
+   * Update element registration when properties change
    */
   useEffect(() => {
-    if (disabled || !ref.current) return;
+    if (isRegistered.current && ref.current && !disabled) {
+      const position = ref.current.getBoundingClientRect();
 
-    const position = getPosition();
-
-    context.registerElement({
-      id,
-      ref,
-      group,
-      position,
-      onActivate,
-      onNavigate,
-      disabled,
-      priority,
-    });
-
-    // Auto-focus if requested
-    if (autoFocus) {
-      context.setFocus(id);
+      registerElementRef.current({
+        id,
+        ref,
+        group,
+        position,
+        onActivate: (...args) => onActivateRef.current?.(...args),
+        onNavigate: (...args) => onNavigateRef.current?.(...args) ?? false,
+        disabled,
+        priority,
+      });
     }
+  }, [id, group, disabled, priority]);
 
+  /**
+   * Unregister element on unmount or id change
+   */
+  useEffect(() => {
     return () => {
-      context.unregisterElement(id);
+      unregisterRef.current(id);
+      isRegistered.current = false;
     };
-  }, [
-    id,
-    group,
-    onActivate,
-    onNavigate,
-    disabled,
-    autoFocus,
-    priority,
-    context,
-    getPosition,
-  ]);
+  }, [id]);
 
   /**
    * Update position on resize and scroll
@@ -103,7 +125,7 @@ export const useFocusable = ({
     const updatePosition = () => {
       if (ref.current) {
         const position = ref.current.getBoundingClientRect();
-        context.updateElementPosition(id, position);
+        updateElementPositionRef.current(id, position);
       }
     };
 
@@ -118,7 +140,7 @@ export const useFocusable = ({
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition, true);
     };
-  }, [id, disabled, context]);
+  }, [id, disabled]);
 
   /**
    * Handle DOM ref callback
@@ -126,21 +148,42 @@ export const useFocusable = ({
   const handleRef = useCallback((element: HTMLElement | null) => {
     (ref as React.MutableRefObject<HTMLElement | null>).current = element;
 
-    // Update position when ref changes
-    if (element) {
+    // Register element when ref is first set
+    if (element && !isRegistered.current && !disabled) {
       const position = element.getBoundingClientRect();
-      context.updateElementPosition(id, position);
+
+      registerElementRef.current({
+        id,
+        ref,
+        group,
+        position,
+        onActivate: (...args) => onActivateRef.current?.(...args),
+        onNavigate: (...args) => onNavigateRef.current?.(...args) ?? false,
+        disabled,
+        priority,
+      });
+
+      isRegistered.current = true;
+
+      // Auto-focus if requested
+      if (autoFocus) {
+        setFocusRef.current(id);
+      }
+    } else if (element && isRegistered.current) {
+      // Just update position if already registered
+      const position = element.getBoundingClientRect();
+      updateElementPositionRef.current(id, position);
     }
-  }, [id, context]);
+  }, [id, group, disabled, autoFocus, priority]);
 
   /**
    * Handle focus event
    */
   const handleFocus = useCallback(() => {
     if (!disabled) {
-      context.setFocus(id);
+      setFocusRef.current(id);
     }
-  }, [id, disabled, context]);
+  }, [id, disabled]);
 
   /**
    * Handle click event
@@ -148,18 +191,18 @@ export const useFocusable = ({
   const handleClick = useCallback(() => {
     if (!disabled) {
       // Set focus first
-      context.setFocus(id);
+      setFocusRef.current(id);
       // Then activate
-      onActivate?.();
+      onActivateRef.current?.();
     }
-  }, [id, disabled, onActivate, context]);
+  }, [id, disabled]);
 
   /**
    * Programmatically focus this element
    */
   const focus = useCallback(() => {
-    context.setFocus(id);
-  }, [id, context]);
+    setFocusRef.current(id);
+  }, [id]);
 
   return {
     isFocused,
