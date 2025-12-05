@@ -199,10 +199,10 @@ export const calculateNavigationScore = (
     }
   }
 
-  // Weight primary distance more than secondary (alignment)
+  // Weight primary distance MUCH more than secondary (alignment)
   // This ensures we prioritize elements in the correct direction
-  // while still considering alignment
-  return primaryDistance + secondaryDistance * 0.5;
+  // Primary distance is weighted 3x to strongly favor closer elements
+  return primaryDistance * 3 + secondaryDistance * 0.3;
 };
 
 /**
