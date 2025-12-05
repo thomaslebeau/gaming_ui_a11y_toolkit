@@ -22,36 +22,53 @@ export const findClosestElement = (
 ): FocusableElement | null => {
   const allElements = Array.from(elements.values()).filter(el => !el.disabled);
 
+  console.log('🔍 Finding closest element in direction:', direction);
+  console.log('📍 From element:', from?.id);
+  console.log('📊 Total available elements:', allElements.length);
+
   if (allElements.length === 0) {
     return null;
   }
 
   // If no current focus, return the first element (or highest priority)
   if (!from) {
-    return allElements.reduce((highest, current) => {
+    const first = allElements.reduce((highest, current) => {
       const highestPriority = highest.priority ?? 0;
       const currentPriority = current.priority ?? 0;
       return currentPriority > highestPriority ? current : highest;
     }, allElements[0]);
+    console.log('✅ No current focus, returning first element:', first.id);
+    return first;
   }
 
   // Filter candidates based on direction
   const candidates = allElements.filter(el => {
     if (el.id === from.id) return false;
 
-    return isInDirection(from.position, el.position, direction);
+    const inDirection = isInDirection(from.position, el.position, direction);
+    if (inDirection) {
+      console.log(`  ✓ ${el.id} is in ${direction} direction`);
+    }
+    return inDirection;
   });
 
+  console.log('📋 Candidates found:', candidates.length);
+
   if (candidates.length === 0) {
+    console.log('❌ No candidates in direction:', direction);
     return null;
   }
 
   // Find the closest candidate using a weighted scoring system
-  return candidates.reduce((closest, candidate) => {
+  const winner = candidates.reduce((closest, candidate) => {
     const scoreCurrent = calculateNavigationScore(from, candidate, direction);
     const scoreClosest = calculateNavigationScore(from, closest, direction);
+    console.log(`  Score ${candidate.id}: ${scoreCurrent.toFixed(2)} vs ${closest.id}: ${scoreClosest.toFixed(2)}`);
     return scoreCurrent < scoreClosest ? candidate : closest;
   });
+
+  console.log('🎯 Winner:', winner.id);
+  return winner;
 };
 
 /**
@@ -77,16 +94,30 @@ export const isInDirection = (
     y: to.top + to.height / 2,
   };
 
+  const deltaX = toCenter.x - fromCenter.x;
+  const deltaY = toCenter.y - fromCenter.y;
+
+  let result = false;
   switch (direction) {
     case 'up':
-      return toCenter.y < fromCenter.y;
+      result = toCenter.y < fromCenter.y;
+      break;
     case 'down':
-      return toCenter.y > fromCenter.y;
+      result = toCenter.y > fromCenter.y;
+      break;
     case 'left':
-      return toCenter.x < fromCenter.x;
+      result = toCenter.x < fromCenter.x;
+      break;
     case 'right':
-      return toCenter.x > fromCenter.x;
+      result = toCenter.x > fromCenter.x;
+      break;
   }
+
+  if (result) {
+    console.log(`    isInDirection(${direction}): deltaX=${deltaX.toFixed(0)}, deltaY=${deltaY.toFixed(0)}`);
+  }
+
+  return result;
 };
 
 /**
