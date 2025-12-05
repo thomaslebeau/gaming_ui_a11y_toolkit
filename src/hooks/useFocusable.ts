@@ -59,7 +59,7 @@ export const useFocusable = ({
    * Register/update element when options change
    */
   useEffect(() => {
-    if (disabled || !ref.current) return;
+    if (disabled) return;
 
     const position = getPosition();
 
@@ -75,7 +75,7 @@ export const useFocusable = ({
     });
 
     // Auto-focus if requested
-    if (autoFocus) {
+    if (autoFocus && ref.current) {
       context.setFocus(id);
     }
 
