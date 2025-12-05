@@ -3,3 +3,5 @@
  */
 
 export { useGamepadNavigation } from './useGamepadNavigation';
+export { useFocusable } from './useFocusable';
+export { useFocusContext } from './useFocusContext';
