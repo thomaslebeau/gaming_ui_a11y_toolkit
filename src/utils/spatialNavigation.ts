@@ -100,23 +100,28 @@ export const isInDirection = (
   const absDeltaX = Math.abs(deltaX);
   const absDeltaY = Math.abs(deltaY);
 
+  // Tolerance factor: allows elements within a wider cone
+  // 0.5 means the primary direction must be at least 50% of the secondary
+  // This creates a cone of approximately ±63° from the primary axis
+  const DIRECTION_TOLERANCE = 0.5;
+
   let result = false;
   switch (direction) {
     case 'up':
-      // Must be above AND vertical distance must be dominant
-      result = deltaY < 0 && absDeltaY > absDeltaX;
+      // Must be above AND vertical distance should be significant
+      result = deltaY < 0 && absDeltaY >= absDeltaX * DIRECTION_TOLERANCE;
       break;
     case 'down':
-      // Must be below AND vertical distance must be dominant
-      result = deltaY > 0 && absDeltaY > absDeltaX;
+      // Must be below AND vertical distance should be significant
+      result = deltaY > 0 && absDeltaY >= absDeltaX * DIRECTION_TOLERANCE;
       break;
     case 'left':
-      // Must be to the left AND horizontal distance must be dominant
-      result = deltaX < 0 && absDeltaX > absDeltaY;
+      // Must be to the left AND horizontal distance should be significant
+      result = deltaX < 0 && absDeltaX >= absDeltaY * DIRECTION_TOLERANCE;
       break;
     case 'right':
-      // Must be to the right AND horizontal distance must be dominant
-      result = deltaX > 0 && absDeltaX > absDeltaY;
+      // Must be to the right AND horizontal distance should be significant
+      result = deltaX > 0 && absDeltaX >= absDeltaY * DIRECTION_TOLERANCE;
       break;
   }
 
