@@ -61,6 +61,11 @@ export const useFocusable = ({
   const onActivateRef = useRef(onActivate);
   const onNavigateRef = useRef(onNavigate);
 
+  /**
+   * Track if element has been registered
+   */
+  const isRegistered = useRef(false);
+
   useEffect(() => {
     onActivateRef.current = onActivate;
     onNavigateRef.current = onNavigate;
@@ -121,11 +126,6 @@ export const useFocusable = ({
       window.removeEventListener('scroll', updatePosition, true);
     };
   }, [id, disabled, context]);
-
-  /**
-   * Track if element has been registered
-   */
-  const isRegistered = useRef(false);
 
   /**
    * Handle DOM ref callback
