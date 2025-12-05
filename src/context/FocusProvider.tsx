@@ -126,9 +126,7 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
    * Register a new focusable element
    */
   const registerElement = useCallback((element: FocusableElement) => {
-    console.log('✨ Registering element:', element.id, 'Group:', element.group);
     elementsRef.current.set(element.id, element);
-    console.log('📊 Total registered elements:', elementsRef.current.size);
   }, []);
 
   /**
@@ -176,11 +174,8 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
    */
   const navigateInDirection = useCallback(
     (direction: NavigationDirection) => {
-      console.log('🧭 navigateInDirection called:', direction);
-
       const now = Date.now();
       if (now - lastNavigationTime.current < navigationDelay) {
-        console.log('⏱️ Navigation debounced (too fast)');
         return;
       }
 
@@ -188,12 +183,8 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
         ? elementsRef.current.get(focusedId) ?? null
         : null;
 
-      console.log('📍 Current element:', currentElement?.id || 'none');
-      console.log('📊 Total elements:', elementsRef.current.size);
-
       // Allow element to handle navigation first
       if (currentElement?.onNavigate?.(direction)) {
-        console.log('✅ Element handled navigation internally');
         return; // Element handled it
       }
 
@@ -215,11 +206,8 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
       }
 
       if (nextElement) {
-        console.log('➡️ Moving focus to:', nextElement.id);
         lastNavigationTime.current = now;
         setFocus(nextElement.id);
-      } else {
-        console.log('❌ No next element found');
       }
     },
     [focusedId, navigationMode, setFocus, navigationDelay]
@@ -337,48 +325,16 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
    */
   useEffect(() => {
     let animationId: number;
-    let frameCount = 0;
 
     const pollGamepad = () => {
       const gamepads = navigator.getGamepads();
       let hasGamepad = false;
-
-      // Log every 60 frames (about once per second at 60fps)
-      const shouldLog = frameCount % 60 === 0;
 
       for (let i = 0; i < gamepads.length; i++) {
         const gamepad = gamepads[i];
         if (!gamepad) continue;
 
         hasGamepad = true;
-
-        if (shouldLog) {
-          console.log('🎮 Gamepad detected:', gamepad.id);
-          console.log('📍 Registered elements:', elementsRef.current.size);
-          console.log('🎯 Current focus:', focusedId);
-        }
-
-        // Log D-Pad buttons when pressed
-        if (gamepad.buttons[GAMEPAD_BUTTONS.DPAD_UP]?.pressed) {
-          console.log('⬆️ D-Pad UP pressed');
-        }
-        if (gamepad.buttons[GAMEPAD_BUTTONS.DPAD_DOWN]?.pressed) {
-          console.log('⬇️ D-Pad DOWN pressed');
-        }
-        if (gamepad.buttons[GAMEPAD_BUTTONS.DPAD_LEFT]?.pressed) {
-          console.log('⬅️ D-Pad LEFT pressed');
-        }
-        if (gamepad.buttons[GAMEPAD_BUTTONS.DPAD_RIGHT]?.pressed) {
-          console.log('➡️ D-Pad RIGHT pressed');
-        }
-
-        // Log stick movement
-        const xAxis = gamepad.axes[GAMEPAD_AXES.LEFT_STICK_X] || 0;
-        const yAxis = gamepad.axes[GAMEPAD_AXES.LEFT_STICK_Y] || 0;
-
-        if (Math.abs(xAxis) > 0.1 || Math.abs(yAxis) > 0.1) {
-          console.log('🕹️ Left Stick:', { x: xAxis.toFixed(2), y: yAxis.toFixed(2) });
-        }
 
         // D-Pad navigation
         handleButton(gamepad, GAMEPAD_BUTTONS.DPAD_UP, navigateUp);
@@ -393,12 +349,7 @@ export const FocusProvider: React.FC<FocusProviderProps> = ({
         handleStick(gamepad);
       }
 
-      if (shouldLog && !hasGamepad) {
-        console.log('❌ No gamepad connected');
-      }
-
       setIsGamepadConnected(hasGamepad);
-      frameCount++;
       animationId = requestAnimationFrame(pollGamepad);
     };
 
